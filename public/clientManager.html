@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+
+
+	<style>
+
+	body{
+
+		padding-left:400px;
+	}	
+
+	.display-results{
+		border:2px black solid;
+		width:200px;
+		float:center;
+		margin-top: 25px;
+		display: inline-block;
+		position: relative;
+		padding: 50px;
+	}	
+
+	#warningMessage{
+	 color:red;
+	
+	}
+
+	#payment{
+		color:black;
+	}
+
+	#otherAmount{
+		color:red;
+	}
+	
+	.Edit-Section{
+		display:none;
+	}		
+
+	.show-first{
+		display:none;
+		
+	}
+
+	.show-later{
+		display:none;
+	}
+
+	.display-leader{
+		/*border:1px black solid;*/
+		width:100px;
+		float:center;
+		margin:right;
+		display: inline-block;
+		position: relative;
+		padding: 5px;
+	}
+
+	.board-clear{
+		display:none;
+	}
+
+	input{
+		padding:5px;
+		background-color:#f0f5f5;
+	}
+
+	label{
+		padding:10px;
+		background-color:#669999;
+		border-radius: 5px;
+
+	}
+
+	h1{
+		padding-left: 175px;
+	}
+
+	.editHide{
+		padding:20px;
+
+	}
+
+	</style>
+	
+	
+	</head>
+
+	<body>
+		<h1>Client Manager</h1>
+		<label>Enter new client name</label>
+		<br></br>
+		
+		<input type="text" id="name" placeholder="New Client Name">
+		<input type="text" id="referrerName" placeholder="Referral Name" >
+		<input type="button" value="Create New Client" id = "newClientButton">
+		 <div id="warningMessage"></div>
+		<br></br>
+		<label>client for purchase</label>
+		<br></br>
+		<input type="text" id="lookupName" placeholder="Customer for Transaction">
+		<input type="button" value="$5 purchase" id="fiveDollarPurchaseButton">
+		<div id ="payment"></div>
+		<br></br>
+		<label> Other Purchase amount </label>
+		<br></br>
+		<input type="text" id="lookupNameNew" placeholder="company name">
+		<input type="text"  value="" placeholder="purchase amount" id="newNumber">
+		<input type="button" value="purchase" id="purchaseAmountButton">
+		<div id="otherAmount"></div>
+		<br></br>
+		<label> Search</label>
+		<input type="text" id="fromClient" placeholder="from Client">
+		<input type="text" id="toClient" placeholder="to Client">
+		<input type="number" id="otherquanity" value= "" placeholder="Amount">
+		<input type="button" value="transfer" id="transferButton">
+		<br></br>
+		<div>
+		<label> Find Client </label>
+		<input type="text" value="" id="lookupClient" placeholder="Client Name">
+		<input type="button" value="search" id="findShowButton">
+		</div>
+		<div id ="find-Customer" class= "display-results">
+		</div>
+		<div id = "Edit-Field" Class = "Edit-Section">
+			<div class="input-group">
+				<div class="input-label">
+					Company Name:
+				</div>
+				<input class="namet-input" id="edit-Company">
+			</div>
+
+			<div class = "input-group">
+				<div class ="input-label">
+				Credit Balance:
+				</div>
+				<input type="input-group" id="edit-Balance">
+			</div>
+
+			<div class ="input-group">
+				<div class="input-label">
+				Total Transactions:
+				</div>
+				<input type="input-group" id="total-Transactions">	
+			</div>
+			
+			<div class ="input-group">
+				<div class="input-label">
+					Eligible for Discount:
+					<select id = "eligible-Discount">
+					<option value ="true">True</option>
+					<option vale ="false">False</option>
+					</select>
+				</div>
+			</div>		
+
+			<div>
+				<input type="button" value="Save" id="saveDataButton">
+				<input type="button" value="Cancel Edit" id="cancelEditButton">
+			</div>
+		</div>
+
+		<div class="show-first" id = "editHide">
+			<input type="button" value="Edit"  id="showLookEditButton">
+		</div>
+
+		<div id="leaderBoard" class="display-leader">
+		</div>
+
+		<div>
+			<input type="button" value ="Leader Board" id="leaderBoardDataButton">
+		</div>
+
+		<div id="clearLeaderBoard" class="board-clear">
+			<input type="button" value="clear" id="clearButton">
+		</div>	
+		<div>
+			<input type="text" placeholder="random" id="textInput">
+			<input type="button" value="test Ajax" id="testAjax">
+			<input type="button" value="quadrify input" id="quadInput">
+			<input type="button" value="test data" id="testData">
+		</div>	
+
+
+
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js"</script>
+		<script src = "server.js"</script>
+		<script>
+	 
+
+	$( document ).ready(function() {
+   		console.log( "ready!" );
+	});
+
+	document.getElementById("testAjax").addEventListener("click", function(){
+		testRunAjax();
+	});
+	document.getElementById("quadInput").addEventListener("click", function(){
+		quadInput();
+	});
+
+	document.getElementById("testData").addEventListener("click", function(){
+		var testsubject = {firstName:"alex", lastName:"mcalex"};
+		testData(testsubject);
+	});
+
+		function testData(testsubject){
+			$.ajax({
+				url:'/data',
+				method: 'POST',
+				dataType:'json',
+				data:{payload:JSON.stringify(testsubject)},
+				success: function(data){
+					console.log("it worked", data);
+				},
+				error: function(err){
+					console.log(err);
+				}
+			});
+		}
+
+
+
+		var clientArray = [];
+
+
+		function createNewClient () {
+			var newClientName = document.getElementById("name").value.toLowerCase().replace(/\s+/g, '');
+			var referredBy = document.getElementById('referrerName').value;
+			var newClient = newClientConstructor(newClientName,referredBy);
+			var warning = "";  
+			console.log(clientArray);
+			var collison = false;
+
+			for (var i = 0; i < clientArray.length; i++) {
+				if (newClientName === clientArray[i].clientName) {
+					console.log("name exists");
+					collison = true;
+					warning = "<div class = 'warningMessage'>"+
+						"<p> The Customer " + newClientName + " is already entered into the database " +  "</p>"
+					"</div>"
+
+					document.getElementById("warningMessage").innerHTML = warning;
+					document.getElementById("name").addEventListener("click",function(){
+						document.getElementById("warningMessage").innerHTML = "";
+					});
+				}
+			}
+
+				if (referredBy === "") {
+					console.log("first entry");
+				}
+
+				if (newClientName === ""){
+					clientArray.push(newClient);
+					addReferral(referredBy, newClientName);
+					warning = "<div class = 'warningMessage'>"+
+						"<p> The Customer " + newClientName + " has been entered into the database " +  "</p>"
+					"</div>"
+					document.getElementById("warningMessage").innerHTML = warning;
+				}
+				
+				if (collison === false){
+					clientArray.push(newClient);
+					addReferral(referredBy, newClientName);
+						warning = "<div class = 'warningMessage'>"+
+							"<p> The Customer " + newClientName + " has been entered into the database " +  "</p>"
+						"</div>"
+					document.getElementById("warningMessage").innerHTML = warning;	
+				}
+				
+					document.getElementById("name").value = ""
+					document.getElementById("referrerName").value = ""
+				}
+			document.getElementById("newClientButton").addEventListener("click", function(){
+			createNewClient();
+			testData();
+		});
+
+		function newClientConstructor (name, referral) {
+			var client = {
+				clientName : name,
+				creditBalance : 100,
+				eligibleForDiscount : false,
+				totalTransactions : 0,
+				referredBy: referral,
+				referrals: [],
+				buySomething : function (amount) {
+					if (this.eligibleForDiscount) {
+						amount = amount * 0.8;
+					}
+					this.creditBalance = this.creditBalance - amount;
+					this.totalTransactions ++;
+					if (this.totalTransactions > 5) {
+						this.eligibleForDiscount = true;
+					}
+					if (referral) {
+						creditReferralBonus(referral, amount);
+					}
+				}
+			}
+			
+			return client;
+		}
+
+		document.getElementById("fiveDollarPurchaseButton").addEventListener("click", function(){
+			fiveDollarPurchase();
+		});
+		
+		
+
+			function fiveDollarPurchase () {
+				var lookupName = document.getElementById("lookupName").value;
+				var payment = "";
+				var clientRecord;
+				for (var i = 0; i < clientArray.length; i++) {
+					if (lookupName === clientArray[i].clientName) {
+						clientRecord = clientArray[i];
+					}
+				}
+				if (!clientRecord) {
+					// return console.log("no client records found with a name of " + lookupName);
+					payment = "<div class = 'payment'>" +
+					"<p> " + "Error: Client record not found with a name of " + lookupName + "</p>"
+					"</div>"
+					document.getElementById("payment").innerHTML = payment;
+
+				} else {
+					clientRecord.buySomething(5);
+					payment = "<div class = 'payment'>"+
+						"<p> " + lookupName + " transaction has been entered into the database " +  "</p>"
+						"</div>"
+						document.getElementById("payment").innerHTML = payment;
+					
+					}
+
+				document.getElementById("lookupName").addEventListener("click",function(){
+					document.getElementById("payment").innerHTML = "";
+				});
+					
+				console.log("Updated client record: ", JSON.stringify(clientRecord, null, 4));
+				document.getElementById("lookupName").value = "";
+			}
+
+//=========== This function is use a different purchase amount===========
+		
+		 	document.getElementById("purchaseAmountButton").addEventListener("click", function(){
+		 	purchaseAmount()
+		 	})
+		 
+			function purchaseAmount () {
+				var purchaseUpdate ="";
+				var lookupName = document.getElementById("lookupNameNew").value;
+				var purchaseNumber = document.getElementById("newNumber").value;
+				var clientRecord;
+				for (var i = 0; i < clientArray.length; i++){
+					if(lookupName === clientArray[i].clientName){
+						clientRecord = clientArray[i];
+					}
+				}
+				console.log(clientRecord);
+				if (!clientRecord) {
+					purchaseUpdate = "<div class = 'otherAmount'>" +
+					"<p> " + " Error: Client record not found with a name of " + lookupName + "</p>"
+					"</div>"
+					document.getElementById("otherAmount").innerHTML = purchaseUpdate;
+
+				} else {
+					clientRecord.buySomething(purchaseNumber);
+					purchaseUpdate = "<div class = 'otherAmount'>" +
+					"<p> " + " Purchase Complete for " + lookupName  + " in the amount of " + purchaseNumber + "</p>"
+					"</div>"
+					document.getElementById("otherAmount").innerHTML = purchaseUpdate;
+				}
+
+				document.getElementById("lookupNameNew").addEventListener("click",function(){
+					document.getElementById("otherAmount").innerHTML = "";
+				});
+				console.log("Updated client record: ", JSON.stringify(clientRecord, null, 4));
+				document.getElementById("lookupNameNew").value ="";
+				document.getElementById("newNumber").value = "";
+
+			}
+
+//=========== transfers the amount from one client to another, it will also throw and error if no such client exists============
+
+
+			document.getElementById("transferButton").addEventListener("click", function(){
+				transfer();
+			});
+
+
+			function transfer () {
+				var quanity = document.getElementById("otherquanity").value * 1;
+				var lookupClient = document.getElementById("fromClient").value;
+				var lookupSecond = document.getElementById("toClient").value;
+				var fromClientRecord;
+				var toClientRecord;
+				for (var i = 0; i < clientArray.length; i++) {
+					if (lookupClient === clientArray[i].clientName){
+						fromClientRecord = clientArray[i];
+					}
+					
+					if (lookupSecond === clientArray[i].clientName){
+							toClientRecord = clientArray[i];
+					}		
+				}
+
+				console.log(fromClientRecord, toClientRecord);
+
+				if (!fromClientRecord) {
+					return console.log("no client records found with a name of " + lookupClient);	
+				}
+				if(!toClientRecord){
+					return console.log("no client records found with a name of " + lookupSecond);	
+				}
+				else {
+					transferAmount(quanity);
+				}	
+
+				console.log("Updated client record: ", JSON.stringify(toClientRecord, null, 4));
+				console.log("Updated client record: ", JSON.stringify(fromClientRecord, null, 4));
+				document.getElementById("fromClient").value = "";
+				document.getElementById("toClient").value = " ";
+				document.getElementById("otherquanity").value = "";
+				
+			function transferAmount(){
+				toClientRecord.creditBalance = toClientRecord.creditBalance + quanity;
+				fromClientRecord.creditBalance = fromClientRecord.creditBalance - quanity;
+			}	
+		
+			return toClientRecord;
+			return fromClientRecord;	
+			console.log(fromClientRecord);
+		}
+
+		// this looks up the client record and displays into a div
+//==========This function looks up the client, lets them know if there is an error, prints results to the div=======
+
+	
+		document.getElementById("findShowButton").addEventListener("click", function(){
+			findClient();
+			showEdit();
+		})
+
+		function findClient(){
+			var customer = document.getElementById("lookupClient").value;
+			var error = "";
+			var print = "";
+			var customerFound = false;
+			for (var i = 0; i < clientArray.length; i++) {
+				if (customer === clientArray[i].clientName){
+					print = "<div class ='find-Customer'>"+
+					"<p> Client Name: " + clientArray[i].clientName + "</p>" +
+					"<p> Account Balance: " + clientArray[i].creditBalance + "</p>" +
+					"<p> Total Transactions: " + clientArray[i].totalTransactions + "</p>" +
+					"<p> Eligible for Discount: " + clientArray[i].eligibleForDiscount + "</p>"
+					"</div>"
+					document.getElementById("find-Customer").innerHTML = print;
+					customerFound = true;
+				} 
+
+				if (customerFound === false) {
+					print ="<div class = 'find-Customer'>"+
+					"<p> Customer Not Found " +  customer + "</p>"
+					"</div>"
+					document.getElementById("find-Customer").innerHTML = print;
+				}		
+			}
+				document.getElementById("lookupClient").value = "";
+		}	
+
+
+	
+
+		
+//======This function populates the edit input fields===========		
+		function showEditFields (){	
+			for (var i = 0; i < clientArray.length; i++) {
+				document.getElementById('edit-Company').value = clientArray[i].clientName;
+				document.getElementById('edit-Balance').value = clientArray[i].creditBalance;
+				document.getElementById('total-Transactions').value = clientArray[i].totalTransactions;
+				document.getElementById('eligible-Discount').value = clientArray[i].eligibleForDiscount;
+			}
+			
+			console.log(clientArray);
+			
+		}	 
+			
+//======This function shows the Input for the edits=========
+
+		document.getElementById("showLookEditButton").addEventListener("click", function(){
+			showLookUpFields();
+			showEditFields();
+		})
+
+		function showLookUpFields (){
+			var elsToHide = document.querySelectorAll('.Edit-Section');
+			for (var i = 0; i < elsToHide.length; i++) {
+				elsToHide[i].style.display = "initial";	
+				showEditFields();
+			}
+						
+		}
+
+//======This function Saves the Data============	
+
+		document.getElementById("saveDataButton").addEventListener("click", function(){
+			saveData();
+
+		})
+
+		function saveData(){
+			var customer = document.getElementById("lookupClient").value;
+			var clientName = document.getElementById("edit-Company").value;
+			var creditBalance = document.getElementById("edit-Balance").value;
+			var totalTransactions = document.getElementById("total-Transactions").value;
+			var eligibleForDiscount = document.getElementById("eligible-Discount").value;
+			var recordUpdate = "";
+			for (var i = 0; i < clientArray.length; i++) {
+				if (clientArray[i].clientName === customer) {
+					clientArray[i].clientName = clientName;
+					clientArray[i].creditBalance = creditBalance;
+					clientArray[i].totalTransactions = totalTransactions;
+					clientArray[i].eligibleForDiscount = eligibleForDiscount;
+					var recordUpdate = "<div class ='find-Customer'>"+
+					"<p> Client Updated " + clientArray[i].clientName + "</p>" +
+					"</div>"
+					document.getElementById("find-Customer").innerHTML = recordUpdate;
+				}
+			}	
+			document.getElementById("showLookEditButton").innerHTML = "";
+			cancelEdit();
+					
+		}
+
+		
+
+		// document.getElementById("saveDataButton").addEventListener("click", function(){
+		// 	saveData();
+		// });	
+
+				
+		
+
+//======This function Cancels the Edits=========	
+
+		document.getElementById("cancelEditButton").addEventListener("click", function(){
+			cancelEdit();
+		})
+
+		function cancelEdit(){
+			var elsToHide = document.querySelectorAll('.Edit-Section');
+				for (var i = 0; i < elsToHide.length; i++) {
+				 	elsToHide[i].style.display = "none";	
+			document.getElementById("edit-Company").value = "";
+			document.getElementById("edit-Balance").value = "";
+			document.getElementById("total-Transactions").value = "";
+			document.getElementById("eligible-Discount").value = "";
+			document.querySelectorAll('Edit-Section').value = "";
+			}
+		}
+
+//=======This function shows the edit Button==========		
+		function showEdit(){
+		var show = document.querySelectorAll('.show-first');
+			for (var i = 0; i < show.length; i++) {
+				show[i].style.display = "initial";		
+				
+				
+			}
+		}
+
+//======This function hides the edit button================
+		function hide(){
+		var hideEdit = document.querySelectorAll('.Edit-Section');
+			for (var i = 0; i < hideEdit.length; i++) {
+				hideEdit[i].style.display = "none";
+			}				
+		}
+
+
+		document.getElementById("leaderBoardDataButton").addEventListener("click", function(){
+			leaderBoardData();
+		})
+
+		function leaderBoardData(){
+			clientArray.sort(function(a,b){
+				return b.creditBalance - a.creditBalance;
+
+			});
+			var showResults = "";
+			var results = "";
+			for (var i = 0; i < clientArray.length; i++) {
+				document.getElementById("leaderBoard").innerHTML = results
+				var showResults = "<div class ='display-leader'>"+
+				"<p> Client Name: " + clientArray[i].clientName + "</p>" +
+				"<p> Account Balance: " + clientArray[i].creditBalance + "</p>" +
+				"</div>"
+				results += showResults;
+			}	
+			clearBoard();
+			document.getElementById("clearButton").addEventListener("click",function(){
+			clearLeadBoard();
+			hideEditB();
+			})
+					
+		}	
+
+
+
+		function clearBoard(){
+			var showClear = document.querySelectorAll('.board-clear');
+			for (var i = 0; i < showClear.length; i++) {
+				showClear[i].style.display = "initial";
+			}
+		}
+
+		function clearLeadBoard(){
+			document.getElementById("leaderBoard").style.display = "none";
+	
+		}
+
+		function hideEditB(){
+			var showClear = document.querySelectorAll('.board-clear');
+			for (var i = 0; i < showClear.length; i++) {
+				showClear[i].style.display = "none";
+			}
+		}
+
+
+		function addReferral(referralSource, referrals){
+			var referralNoMatch = "";
+			var noMatch = false;
+			for (var i= 0; i < clientArray.length; i++){
+				if (referralSource === clientArray[i].clientName) {
+					clientArray[i].referrals.push(referrals);
+					noMatch = true;
+				}
+			}
+				if (noMatch === false){
+				referralNoMatch = "<div class = 'warningMessage'>"+
+				"<p> Error, the client you have entered " + referralSource + " is not in the system " + "</p>"
+				"</div>"
+				document.getElementById("warningMessage").innerHTML = referralNoMatch;
+				document.getElementById("name").addEventListener("click", function(){
+				document.getElementById("warningMessage").innerHTML = "";
+				});
+
+			}
+		}
+
+		function creditReferralBonus(referral, amount){
+			for (var i = 0; i < clientArray.length; i++) {
+				if (referral === clientArray[i].clientName) {
+					amount = amount * 0.05;
+					clientArray[i].creditBalance = clientArray[i].creditBalance + amount
+				}		
+			}
+		}
+
+
+
+		</script>
+
+	</body>
+
+</html>
