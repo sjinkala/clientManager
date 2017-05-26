@@ -36,15 +36,15 @@ server.route({
 		connection.connect(function(err){
 			if(err) throw err;
 			console.log("Connected!");
-			var newData = jsonsafeparse(request.payload);
+			var newData = JSON.parse(request.payload);
 			console.log(newData);
 			var dataValues = [request.payload.clientName,request.payload.referral, request.payload.balance];
-			// console.log(dataValues);
-			// var sql = 'INSERT INTO clients (clientName, referral, balance) VALUES(?,?,?)';
-			// connection.query(sql,dataValues,function(err,results){
-			// 	if (err) throw err;
-			// 	console.log("Number of records inserted: " + results.affectedRows);
-			// });
+			console.log(dataValues);
+			var sql = 'INSERT INTO clients (clientName, referral, balance) VALUES(?,?,?)';
+			connection.query(sql,dataValues,function(err,results){
+				if (err) throw err;
+				console.log("Number of records inserted: " + results.affectedRows);
+			});
 		});
 
 		
