@@ -198,21 +198,51 @@
 		quadInput();
 	});
 
-	document.getElementById("testData1").addEventListener("click", function(){
-		var testsubject = {firstName:"alex", lastName:"mcalex"};
-		testData(testsubject);
-	});
+	// document.getElementById("testData1").addEventListener("click", function(){
+	// 	var testsubject = {firstName:"alex", lastName:"mcalex"};
+	// 	testData(testsubject);
+	// });
 
-	function testData(testsubject){
+	function testData(newClient){
 		$.ajax({
 			url:'/data',
 			method: 'POST',
 			dataType:'json',
-			data:{payload:JSON.stringify(testsubject)},
+			data:{payload:JSON.stringify(newClient)},
 			success: function(data){
 				console.log("it worked", data);
 			},
 			error: function(err){
+				console.log(err);
+			}
+		});
+	}
+
+	function purchaseData(clientRecord){
+		$.ajax({
+			url:'/purchasedata',
+			method: 'POST',
+			dataType: 'json',
+			data:{payload:JSON.stringify(clientRecord)},
+			success:function(data){
+				console.log("purchase Data added", data);
+			},
+			error:function(err){
+				console.log(err);
+			}
+		});
+	}
+
+	function diffAmount(){
+		$.ajax({
+			url:'/data',
+			method:'POST',
+			dataType: 'json',
+			data:{payload:JSON.stringify()},
+			success:function(data){
+				console.log("different amount added",data);
+			},
+			error:function(err){
 				console.log(err);
 			}
 		});
@@ -262,7 +292,8 @@
 				warning = "<div class = 'warningMessage'>"+
 					"<p> The Customer " + newClientName + " has been entered into the database " +  "</p>"
 				"</div>"
-			document.getElementById("warningMessage").innerHTML = warning;	
+			document.getElementById("warningMessage").innerHTML = warning;
+			testData(newClient);
 		}
 		
 			document.getElementById("name").value = ""
@@ -270,10 +301,11 @@
 		}
 		document.getElementById("newClientButton").addEventListener("click", function(){
 			createNewClient();
+			// testData(newClient);
 		
 	});
 
-	function newClientConstructor (name, referral) {
+	function newClientConstructor (name,referral) {
 		var client = {
 			clientName : name,
 			creditBalance : 100,
@@ -291,7 +323,7 @@
 					this.eligibleForDiscount = true;
 				}
 				if (referral) {
-					creditReferralBonus(referral, amount);
+					creditReferralBonus(referral,amount);
 				}
 			}
 		}
@@ -334,6 +366,7 @@
 		});
 			
 		console.log("Updated client record: ", JSON.stringify(clientRecord, null, 4));
+		purchaseData(clientRecord);
 		document.getElementById("lookupName").value = "";
 	}
 

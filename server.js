@@ -1,6 +1,7 @@
 const Hapi = require('hapi');
 const Good = require('good');
 var mysql = require('mysql');
+var jsonsafeparse = require('json-safe-parse');
 
 
 
@@ -17,8 +18,6 @@ server.register({
 	register: require('./myplugin')
 })
 
-
-
 server.route({
 	method:'POST',
 	path:'/data',
@@ -29,13 +28,26 @@ server.route({
 			host:'localhost',
 			user:'root',
 			password:'Closeme1!',
-			database: 'clients'
-
-			
+			database: 'clients',
 		});
-		connection.connect();
+		// connection.connect();
 		console.log(request.payload, "testing the payload");
 		reply({results:request.payload});
+		connection.connect(function(err){
+			if(err) throw err;
+			console.log("Connected!");
+			var newData = jsonsafeparse(request.payload);
+			console.log(newData);
+			var dataValues = [request.payload.clientName,request.payload.referral, request.payload.balance];
+			// console.log(dataValues);
+			// var sql = 'INSERT INTO clients (clientName, referral, balance) VALUES(?,?,?)';
+			// connection.query(sql,dataValues,function(err,results){
+			// 	if (err) throw err;
+			// 	console.log("Number of records inserted: " + results.affectedRows);
+			// });
+		});
+
+		
 		
 
 		
@@ -52,6 +64,23 @@ server.route({
 
 	}	
 })
+
+server.route({
+	method:'POST',
+	path:'/purchasedata',
+	handler:function(request,reply){
+		var connection = mysql.createConnection({
+			host:'localhost',
+			user:'root',
+			password:'Closeme1!',
+			database: 'clients'
+		});
+
+		connection.connect();
+		console.log(request.payload, "purchasedata");
+		reply({results:request.payload});
+	}	
+});
 
 server.route({
 	method:'GET',
