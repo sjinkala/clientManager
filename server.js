@@ -32,13 +32,12 @@ server.route({
 		});
 		// connection.connect();
 		console.log(request.payload, "testing the payload");
+		console.log(request.payload.clientName);
 		reply({results:request.payload});
 		connection.connect(function(err){
 			if(err) throw err;
 			console.log("Connected!");
-			var newData = JSON.parse(request.payload);
-			console.log(newData);
-			var dataValues = [request.payload.clientName,request.payload.referral, request.payload.balance];
+			var dataValues = [request.payload.clientName, request.payload.referredBy, request.payload.creditBalance];
 			console.log(dataValues);
 			var sql = 'INSERT INTO clients (clientName, referral, balance) VALUES(?,?,?)';
 			connection.query(sql,dataValues,function(err,results){

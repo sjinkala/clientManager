@@ -208,7 +208,8 @@
 			url:'/data',
 			method: 'POST',
 			dataType:'json',
-			data:{payload:JSON.stringify(newClient)},
+			contentType: "application/json",
+			data:JSON.stringify(newClient),
 			success: function(data){
 				console.log("it worked", data);
 			},
@@ -252,7 +253,7 @@
 
 	function createNewClient () {
 		var newClientName = document.getElementById("name").value.toLowerCase().replace(/\s+/g, '');
-		var referredBy = document.getElementById('referrerName').value;
+		var referredBy = document.getElementById('referrerName').value.toLowerCase().replace(/\s+/g, '');
 		var newClient = newClientConstructor(newClientName,referredBy);
 		var warning = "";  
 		console.log(clientArray);
