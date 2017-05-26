@@ -198,11 +198,6 @@
 		quadInput();
 	});
 
-	// document.getElementById("testData1").addEventListener("click", function(){
-	// 	var testsubject = {firstName:"alex", lastName:"mcalex"};
-	// 	testData(testsubject);
-	// });
-
 	function testData(newClient){
 		$.ajax({
 			url:'/data',
@@ -224,7 +219,8 @@
 			url:'/purchasedata',
 			method: 'POST',
 			dataType: 'json',
-			data:{payload:JSON.stringify(clientRecord)},
+			contentType: "application/json",
+			data:JSON.stringify(clientRecord),
 			success:function(data){
 				console.log("purchase Data added", data);
 			},

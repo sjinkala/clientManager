@@ -1,7 +1,7 @@
 const Hapi = require('hapi');
 const Good = require('good');
 var mysql = require('mysql');
-var jsonsafeparse = require('json-safe-parse');
+
 
 
 
@@ -30,7 +30,6 @@ server.route({
 			password:'Closeme1!',
 			database: 'clients',
 		});
-		// connection.connect();
 		console.log(request.payload, "testing the payload");
 		console.log(request.payload.clientName);
 		reply({results:request.payload});
@@ -46,10 +45,6 @@ server.route({
 			});
 		});
 
-		
-		
-
-		
 		// connection.query('SELECT * FROM clients ', function(err,results, fields){
 		// 	connection.end();
 		// 	if(err){
@@ -74,10 +69,15 @@ server.route({
 			password:'Closeme1!',
 			database: 'clients'
 		});
-
-		connection.connect();
 		console.log(request.payload, "purchasedata");
 		reply({results:request.payload});
+		console.log(request.payload.creditBalance + "testing payload balance");
+		connection.connect(function(err){
+			if(err) throw err;
+			var purchaseDataValues = [request.payload.clientName,request.payload.creditBalance];
+			console.log(purchaseDataValues);
+
+		})
 	}	
 });
 
