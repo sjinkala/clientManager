@@ -45,17 +45,6 @@ server.route({
 			});
 		});
 
-		// connection.query('SELECT * FROM clients ', function(err,results, fields){
-		// 	connection.end();
-		// 	if(err){
-		// 		console.log('Data not recived from db:', err);
-		// 	}else{
-		// 		console.log('Data recived from db:', results);
-		// 		reply({results:req.payload});
-		// 	}
-
-		// });
-
 	}	
 })
 
