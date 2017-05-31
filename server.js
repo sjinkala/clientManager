@@ -30,9 +30,6 @@ server.route({
 			password:'Closeme1!',
 			database: 'clients',
 		});
-		// console.log(request.payload, "testing the payload");
-		// console.log(request.payload.clientName);
-		// reply({results:request.payload});
 		connection.connect(function(err,results){
 			console.log("Connected!");
 			var dataValues = [request.payload.clientName, request.payload.referredBy, request.payload.creditBalance];
@@ -85,25 +82,7 @@ server.route({
 					}	
 				});
 			});
-		});
-// 		connection.connect(function(err,results){	
-// 			var purchaseDataValues = [request.payload.clientName,request.payload.creditBalance];
-// 			var sql = 'UPDATE clients SET creditBalance = creditBalance-5 WHERE clientName (?)';
-// 			connection.query(sql,purchaseDataValues,function(err,results){
-// 				var sql_all= "SELECT * FROM clients";
-// 				connection.query(sql_all,function(err,results){
-// 					connection.end();
-// 					if(err){
-// 						reply({err:err});
-// 					} else {
-// 						reply(results);
-// 					}	
-// 				});
-// 			});
-
-// 			console.log(purchaseDataValues);
-// 		});
-		
+		});		
 	}	
 });
 
