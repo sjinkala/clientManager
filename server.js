@@ -30,22 +30,31 @@ server.route({
 			password:'Closeme1!',
 			database: 'clients',
 		});
-		console.log(request.payload, "testing the payload");
-		console.log(request.payload.clientName);
-		reply({results:request.payload});
-		connection.connect(function(err){
-			if(err) throw err;
+		// console.log(request.payload, "testing the payload");
+		// console.log(request.payload.clientName);
+		// reply({results:request.payload});
+		connection.connect(function(err,results){
 			console.log("Connected!");
 			var dataValues = [request.payload.clientName, request.payload.referredBy, request.payload.creditBalance];
 			console.log(dataValues);
 			var sql = 'INSERT INTO clients (clientName, referral, balance) VALUES(?,?,?)';
 			connection.query(sql,dataValues,function(err,results){
-				if (err) throw err;
+					var sql_all= "SELECT * FROM clients";
+					connection.query(sql_all,function(err,results){
+						connection.end();
+						if(err){
+							reply ({err:err});
+						} else {
+							reply(results);
+						}
+					});
+					
 				console.log("Number of records inserted: " + results.affectedRows);
 			});
-		});
 
-	}	
+		});
+	}
+
 })
 
 server.route({
@@ -59,14 +68,42 @@ server.route({
 			database: 'clients'
 		});
 		console.log(request.payload, "purchasedata");
-		reply({results:request.payload});
-		console.log(request.payload.creditBalance + "testing payload balance");
-		connection.connect(function(err){
-			if(err) throw err;
-			var purchaseDataValues = [request.payload.clientName,request.payload.creditBalance];
-			console.log(purchaseDataValues);
+		// reply({results:request.payload});
+		// console.log(request.payload.creditBalance + "testing payload balance");
 
-		})
+		connection.connect(function(err,results){
+			var sql_all= "SELECT * FROM clients";
+			connection.query(sql_all,function(err,results){
+				var purchaseDataValues = [request.payload.clientName,request.payload.creditBalance];
+				var sql = 'UPDATE clients SET creditBalance = creditBalance-5 WHERE clientName (?)';
+				connection.query(sql,purchaseDataValues,function(err,results){
+					connection.end();
+					if(err){
+						reply({err:err});
+					} else {
+						reply(results);
+					}	
+				});
+			});
+		});
+// 		connection.connect(function(err,results){	
+// 			var purchaseDataValues = [request.payload.clientName,request.payload.creditBalance];
+// 			var sql = 'UPDATE clients SET creditBalance = creditBalance-5 WHERE clientName (?)';
+// 			connection.query(sql,purchaseDataValues,function(err,results){
+// 				var sql_all= "SELECT * FROM clients";
+// 				connection.query(sql_all,function(err,results){
+// 					connection.end();
+// 					if(err){
+// 						reply({err:err});
+// 					} else {
+// 						reply(results);
+// 					}	
+// 				});
+// 			});
+
+// 			console.log(purchaseDataValues);
+// 		});
+		
 	}	
 });
 
