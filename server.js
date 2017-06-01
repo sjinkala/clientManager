@@ -51,7 +51,6 @@ server.route({
 
 		});
 	}
-
 })
 
 server.route({
@@ -65,14 +64,13 @@ server.route({
 			database: 'clients'
 		});
 		console.log(request.payload, "purchasedata");
-		// reply({results:request.payload});
-		// console.log(request.payload.creditBalance + "testing payload balance");
+
 
 		connection.connect(function(err,results){
 			var sql_all= "SELECT * FROM clients";
 			connection.query(sql_all,function(err,results){
 				var purchaseDataValues = [request.payload.clientName,request.payload.creditBalance];
-				var sql = 'UPDATE clients SET creditBalance = creditBalance-5 WHERE clientName (?)';
+				var sql = 'UPDATE clients SET balance = balance-5 WHERE clientName =?';
 				connection.query(sql,purchaseDataValues,function(err,results){
 					connection.end();
 					if(err){
