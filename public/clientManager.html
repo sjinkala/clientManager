@@ -349,6 +349,7 @@
 			"<p> " + "Error: Client record not found with a name of " + lookupName + "</p>"
 			"</div>"
 			document.getElementById("payment").innerHTML = payment;
+			purchaseData(clientRecord);
 
 		} else {
 			clientRecord.buySomething(5);
