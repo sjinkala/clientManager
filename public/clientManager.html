@@ -263,19 +263,23 @@
 		var newData = [];
 		console.log(" before entering loop", JSON.stringify(clientRecord, null, 4));
 		console.log(clientRecord);
+		console.log(clientRecord.clientName);
 		for (var i = 0; i < clientRecord.length; i++) {
+
+			console.log(clientRecord.clientName);
 			var client = {
-				clientName : clientRecord.clientName,
-				creditBalance : clientRecord.balance,
-				eligibleForDiscount : clientRecord.eligibleForDiscount,
-				totalTransactions : clientRecord.transactions,
-				referredBy: clientRecord.referral,
-				referrals: clientRecord.referrals
+				clientName : clientRecord[i].clientName,
+				creditBalance : clientRecord[i].balance,
+				eligibleDiscount : clientRecord[i].eligibleDiscount,
+				totalTransactions : clientRecord[i].transactions,
+				referredBy: clientRecord[i].referral,
+				referrals: clientRecord[i].referrals
 			}
 			newData.push(client);
+			console.log(clientRecord.clientName);
 		}
 		console.log(" after for loop", JSON.stringify(newData, null, 4));
-		console.log("results from for loop"+ newData);
+		console.log("results from for loop", newData);
 	}
 	
 	function createNewClient () {
