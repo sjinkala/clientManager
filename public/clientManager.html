@@ -189,14 +189,26 @@
 
 	$( document ).ready(function() {
    		console.log( "ready!" );
+   		database();
 	});
 
-	document.getElementById("testAjax").addEventListener("click", function(){
-		testRunAjax();
-	});
-	document.getElementById("quadInput").addEventListener("click", function(){
-		quadInput();
-	});
+	function database(clientRecord){
+		$.ajax({
+			url:'/database',
+			method: 'POST',
+			dataType:'json',
+			contentType: "application/json",
+			data:JSON.stringify(clientRecord),
+			success: function(data){
+				console.log("it worked", data);
+				databaseValues(data);
+			},
+			error: function(err){
+				console.log(err);
+			}	
+		});
+	}
+
 
 	function testData(newClient){
 		$.ajax({
@@ -247,6 +259,25 @@
 
 	var clientArray = [];
 
+	function databaseValues(clientRecord){
+		var newData = [];
+		console.log(" before entering loop", JSON.stringify(clientRecord, null, 4));
+		console.log(clientRecord);
+		for (var i = 0; i < clientRecord.length; i++) {
+			var client = {
+				clientName : clientRecord.clientName,
+				creditBalance : clientRecord.balance,
+				eligibleForDiscount : clientRecord.eligibleForDiscount,
+				totalTransactions : clientRecord.transactions,
+				referredBy: clientRecord.referral,
+				referrals: clientRecord.referrals
+			}
+			newData.push(client);
+		}
+		console.log(" after for loop", JSON.stringify(newData, null, 4));
+		console.log("results from for loop"+ newData);
+	}
+	
 	function createNewClient () {
 		var newClientName = document.getElementById("name").value.toLowerCase().replace(/\s+/g, '');
 		var referredBy = document.getElementById('referrerName').value.toLowerCase().replace(/\s+/g, '');
@@ -293,8 +324,8 @@
 			testData(newClient);
 		}
 		
-			document.getElementById("name").value = ""
-			document.getElementById("referrerName").value = ""
+			document.getElementById("name").value = "";
+			document.getElementById("referrerName").value = "";
 		}
 		document.getElementById("newClientButton").addEventListener("click", function(){
 			createNewClient();
@@ -349,7 +380,7 @@
 			"<p> " + "Error: Client record not found with a name of " + lookupName + "</p>"
 			"</div>"
 			document.getElementById("payment").innerHTML = payment;
-			purchaseData(clientRecord);
+			// purchaseData(clientRecord);
 
 		} else {
 			clientRecord.buySomething(5);

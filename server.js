@@ -20,6 +20,31 @@ server.register({
 
 server.route({
 	method:'POST',
+	path:'/database',
+	handler:function(request,reply){
+		var connection = mysql.createConnection({
+			host:'localhost',
+			user:'root',
+			password:'Closeme1!',
+			database: 'clients',
+	});
+		connection.connect(function(err,results){
+			console.log("Connected!");
+			var sql_all= "SELECT * FROM clients";
+			connection.query(sql_all,function(err,results){
+				connection.end();
+				if(err){
+					reply ({err:err});
+				} else {
+					reply(results);
+				}
+			});
+		});	
+	}	
+});
+
+server.route({
+	method:'POST',
 	path:'/data',
 	handler:function(request,reply){
 		// var payload = request.payload,
@@ -33,7 +58,6 @@ server.route({
 		connection.connect(function(err,results){
 			console.log("Connected!");
 			var dataValues = [request.payload.clientName, request.payload.referredBy, request.payload.creditBalance];
-			console.log(dataValues);
 			var sql = 'INSERT INTO clients (clientName, referral, balance) VALUES(?,?,?)';
 			connection.query(sql,dataValues,function(err,results){
 				var sql_all= "SELECT * FROM clients";
@@ -50,7 +74,7 @@ server.route({
 			});
 		});
 	}
-})
+});
 
 server.route({
 	method:'POST',
@@ -60,7 +84,7 @@ server.route({
 			host:'localhost',
 			user:'root',
 			password:'Closeme1!',
-			database: 'clients',
+			database: 'clients'
 		});
 		connection.connect(function(err,results){
 			console.log(request.payload, "purchasedata payload");
@@ -80,7 +104,7 @@ server.route({
 						console.log(err + "error from 2nd query");
 					} else {
 						reply(results);
-						console.log(results + "results from 2nd query");
+						console.log(results + "results from 2nd query")
 					}	
 				});
 			});
@@ -167,3 +191,5 @@ server.register({
 		server.log('info', 'Server running at: ' + server.info.uri);
 	});
 });
+
+
