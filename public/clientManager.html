@@ -201,7 +201,8 @@
 			data:JSON.stringify(clientRecord),
 			success: function(data){
 				console.log("it worked", data);
-				databaseValues(data);
+				databaseValues(clientRecord);
+				clientArray = newData;
 			},
 			error: function(err){
 				console.log(err);
