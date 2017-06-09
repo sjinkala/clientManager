@@ -18,6 +18,21 @@ server.register({
 	register: require('./myplugin')
 })
 
+
+function checkDatabase(){
+	var sql_all= "SELECT * FROM clients";
+	connection.query(sql_all,function(err,results){
+		connection.end()
+		if(err){
+			console.log(err + "error all clients query");
+			reply({err:err});
+		} else{
+			reply({message:results});
+			console.log(results + "results from all clients query");
+		}
+	});
+}
+
 server.route({
 	method:'POST',
 	path:'/database',
@@ -60,17 +75,15 @@ server.route({
 			var dataValues = [request.payload.clientName, request.payload.referredBy, request.payload.creditBalance];
 			var sql = 'INSERT INTO clients (clientName, referral, balance) VALUES(?,?,?)';
 			connection.query(sql,dataValues,function(err,results){
-				var sql_all= "SELECT * FROM clients";
-				connection.query(sql_all,function(err,results){
-					connection.end();
-					if(err){
-						reply ({err:err});
-					} else {
-						reply(results);
-					}
-				});
-				
-				console.log("Number of records inserted: " + results.affectedRows);
+				connection.end();
+				if(err){
+					reply ({err:err});
+				} else {
+					checkDatabase();
+					reply(results);
+				}
+			
+				console.log("Number of records inserted: " , results);
 			});
 		});
 	}
@@ -88,25 +101,18 @@ server.route({
 		});
 		connection.connect(function(err,results){
 			console.log(request.payload, "purchasedata payload");
-			var sql_all= "SELECT * FROM clients";
-			connection.query(sql_all,function(err,results){
+			var purchaseDataValues = [request.payload.clientName,request.payload.creditBalance];
+			var sql = 'UPDATE clients SET balance = balance-5 WHERE clientName =?';
+			connection.query(sql,purchaseDataValues,function(err,results){
+				// connection.end();
 				if(err){
-					console.log(err + "error all clients query");
-				} else{
-					console.log(results + "results from all clients query");
+					reply({err:err});
+					console.log(err + "error from 2nd query");
+				} else {
+					checkDatabase(newData);
+					console.log(results + "results from 2nd query")
 				}
-				var purchaseDataValues = [request.payload.clientName,request.payload.creditBalance];
-				var sql = 'UPDATE clients SET balance = balance-5 WHERE clientName =?';
-				connection.query(sql,purchaseDataValues,function(err,results){
-					connection.end();
-					if(err){
-						reply({err:err});
-						console.log(err + "error from 2nd query");
-					} else {
-						reply(results);
-						console.log(results + "results from 2nd query")
-					}	
-				});
+
 			});
 		});		
 	}	

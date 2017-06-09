@@ -235,6 +235,8 @@
 			data:JSON.stringify(clientRecord),
 			success:function(data){
 				console.log("purchase Data added", data);
+				databaseValues(clientRecord);
+				clientArray = newData;
 			},
 			error:function(err){
 				console.log(err);
@@ -273,7 +275,20 @@
 				eligibleDiscount : clientRecord[i].eligibleDiscount,
 				totalTransactions : clientRecord[i].transactions,
 				referredBy: clientRecord[i].referral,
-				referrals: clientRecord[i].referrals
+				referrals: clientRecord[i].referrals,
+				buySomething : function (amount) {
+					if (this.eligibleForDiscount) {
+						amount = amount * 0.8;
+					}
+					this.creditBalance = this.creditBalance - amount;
+					this.totalTransactions ++;
+					if (this.totalTransactions > 5) {
+						this.eligibleForDiscount = true;
+					}
+					if (referral) {
+						creditReferralBonus(referral,amount);
+					}
+				}
 			}
 			newData.push(client);
 			console.log(clientRecord.clientName);
