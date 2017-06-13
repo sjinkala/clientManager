@@ -179,30 +179,30 @@
 			<input type="text" placeholder="random" id="textInput">
 			<input type="button" value="test Ajax" id="testAjax">
 			<input type="button" value="quadrify input" id="quadInput">
-			<input type="button" value="test data" id="testData1">
+			<input type="button" value="test data" id="sendToCloud1">
 		</div>	
 
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"</script>
 	<script src = "server.js"</script>
 	<script>
-	 
+
+	var clientArray = [];
 
 	$( document ).ready(function() {
    		console.log( "ready!" );
    		database();
 	});
 
-	function database(clientRecord){
+	function database(){
 		$.ajax({
 			url:'/database',
 			method: 'POST',
 			dataType:'json',
 			contentType: "application/json",
-			data:JSON.stringify(clientRecord),
+			data:JSON.stringify(),
 			success: function(data){
 				console.log("it worked", data);
-				databaseValues(clientRecord);
-				clientArray = newData;
+				databaseValues(data);
 			},
 			error: function(err){
 				console.log(err);
@@ -211,7 +211,7 @@
 	}
 
 
-	function testData(newClient){
+	function sendToCloud(newClient){
 		$.ajax({
 			url:'/data',
 			method: 'POST',
@@ -219,15 +219,25 @@
 			contentType: "application/json",
 			data:JSON.stringify(newClient),
 			success: function(data){
-				console.log("it worked", data);
+				if(data.err){
+					console.log(data.err);
+				} else {
+					databaseValues(data);
+					console.log("it worked", data);
+				}
 			},
 			error: function(err){
 				console.log(err);
 			}
 		});
 	}
+	//expects object:
+	// {
+	// 	clientName 		: [string],
+	// 	purchaseAmount 	: [number]
+	// }
 
-	function purchaseData(clientRecord){
+	function purchaseData(clientNameAndAmount){
 		$.ajax({
 			url:'/purchasedata',
 			method: 'POST',
@@ -235,9 +245,13 @@
 			contentType: "application/json",
 			data:JSON.stringify(clientRecord),
 			success:function(data){
+				if(data.err){
+					console.log(data.err);
+				} else {
+					databaseValues(data);
+					console.log("it worked", data);
+				}
 				console.log("purchase Data added", data);
-				databaseValues(clientRecord);
-				clientArray = newData;
 			},
 			error:function(err){
 				console.log(err);
@@ -245,13 +259,20 @@
 		});
 	}
 
-	function diffAmount(){
+	function diffAmount(clientNameandDiiffAmmount){
 		$.ajax({
-			url:'/data',
+			url:'/purchasedata',
 			method:'POST',
 			dataType: 'json',
-			data:{payload:JSON.stringify()},
+			data:JSON.stringify(clientRecord),
 			success:function(data){
+				if(data.err){
+					console.log(data.err);
+				}else{
+					// databaseValues(data);
+					purchaseAmount(data);
+					console.log("it worked", data);
+				}
 				console.log("different amount added",data);
 			},
 			error:function(err){
@@ -260,40 +281,42 @@
 		});
 	}
 
-	var clientArray = [];
 
-	function databaseValues(clientRecord){
+	function databaseValues(clientRecordArray){
 		var newData = [];
-		console.log(" before entering loop", JSON.stringify(clientRecord, null, 4));
-		console.log(clientRecord);
-		console.log(clientRecord.clientName);
-		for (var i = 0; i < clientRecord.length; i++) {
+		console.log(" before entering loop", JSON.stringify(clientRecordArray, null, 4));
+		console.log(clientRecordArray);
+		console.log(clientRecordArray.clientName);
+		for (var i = 0; i < clientRecordArray.length; i++) {
 
-			console.log(clientRecord.clientName);
-			var client = {
-				clientName : clientRecord[i].clientName,
-				creditBalance : clientRecord[i].balance,
-				eligibleDiscount : clientRecord[i].eligibleDiscount,
-				totalTransactions : clientRecord[i].transactions,
-				referredBy: clientRecord[i].referral,
-				referrals: clientRecord[i].referrals,
-				buySomething : function (amount) {
-					if (this.eligibleForDiscount) {
-						amount = amount * 0.8;
-					}
-					this.creditBalance = this.creditBalance - amount;
-					this.totalTransactions ++;
-					if (this.totalTransactions > 5) {
-						this.eligibleForDiscount = true;
-					}
-					if (referral) {
-						creditReferralBonus(referral,amount);
-					}
-				}
-			}
+			console.log(clientRecordArray.clientName);
+			var client = newClientConstructor(clientRecordArray[i].clientName, null, clientRecordArray[i]);
+
+			// {
+			// 	clientName : clientRecordArray[i].clientName,
+			// 	creditBalance : clientRecordArray[i].balance,
+			// 	eligibleDiscount : clientRecordArray[i].eligibleDiscount,
+			// 	totalTransactions : clientRecordArray[i].transactions,
+			// 	referredBy: clientRecordArray[i].referral,
+			// 	referrals: clientRecordArray[i].referrals,
+			// 	buySomething : function (amount) {
+			// 		if (this.eligibleForDiscount) {
+			// 			amount = amount * 0.8;
+			// 		}
+			// 		this.creditBalance = this.creditBalance - amount;
+			// 		this.totalTransactions ++;
+			// 		if (this.totalTransactions > 5) {
+			// 			this.eligibleForDiscount = true;
+			// 		}
+			// 		if (referral) {
+			// 			creditReferralBonus(referral,amount);
+			// 		}
+			// 	}
+			// }
 			newData.push(client);
-			console.log(clientRecord.clientName);
+			console.log(clientRecordArray.clientName);
 		}
+		clientArray = newData;
 		console.log(" after for loop", JSON.stringify(newData, null, 4));
 		console.log("results from for loop", newData);
 	}
@@ -318,6 +341,7 @@
 				document.getElementById("name").addEventListener("click",function(){
 					document.getElementById("warningMessage").innerHTML = "";
 				});
+				return;
 			}
 		}
 
@@ -326,40 +350,47 @@
 		}
 
 		if (newClientName === ""){
-			clientArray.push(newClient);
-			addReferral(referredBy, newClientName);
 			warning = "<div class = 'warningMessage'>"+
-				"<p> The Customer " + newClientName + " has been entered into the database " +  "</p>"
+				"<p> Please enter a name for the new client and try again </p>"
 			"</div>"
 			document.getElementById("warningMessage").innerHTML = warning;
+			document.getElementById("name").addEventListener("click", function(){
+				document.getElementById("warningMessage").innerHTML = "";
+			});
+			return;
 		}
 		
 		if (collison === false){
 			clientArray.push(newClient);
 			addReferral(referredBy, newClientName);
-				warning = "<div class = 'warningMessage'>"+
-					"<p> The Customer " + newClientName + " has been entered into the database " +  "</p>"
-				"</div>"
+			warning = "<div class='warningMessage'>"+
+				"<p> The Customer " + newClientName + " has been entered into the database " +  "</p>" +
+				"</div>";
+
 			document.getElementById("warningMessage").innerHTML = warning;
-			testData(newClient);
+			document.getElementById("name").addEventListener("click",function(){
+				document.getElementById("warningMessage").innerHTML = "";
+			});
+			sendToCloud(newClient);
 		}
 		
-			document.getElementById("name").value = "";
-			document.getElementById("referrerName").value = "";
-		}
-		document.getElementById("newClientButton").addEventListener("click", function(){
-			createNewClient();
-			// testData(newClient);
+		document.getElementById("name").value = "";
+		document.getElementById("referrerName").value = "";
+	}
 		
+	document.getElementById("newClientButton").addEventListener("click", function(){
+		createNewClient();
+			// sendToCloud(newClient);
 	});
 
-	function newClientConstructor (name,referral) {
+	function newClientConstructor (name,referral, _clientObj) {
+		var clientObj = _clientObj || {};
 		var client = {
 			clientName : name,
-			creditBalance : 100,
-			eligibleForDiscount : false,
-			totalTransactions : 0,
-			referredBy: referral,
+			creditBalance : clientObj.balance || 100,
+			eligibleForDiscount : clientObj.eligibleDicount || false,
+			totalTransactions :clientObj.totaltransactions || 0,
+			referredBy: clientObj.referredBy || referral,
 			referrals: [],
 			buySomething : function (amount) {
 				if (this.eligibleForDiscount) {
@@ -395,20 +426,28 @@
 			}
 		}
 		if (!clientRecord) {
-			// return console.log("no client records found with a name of " + lookupName);
-			payment = "<div class = 'payment'>" +
-			"<p> " + "Error: Client record not found with a name of " + lookupName + "</p>"
+			payment = "<div class='payment'>" +
+			"<p> Error: Client record not found with a name of " + lookupName + "</p>"
 			"</div>"
 			document.getElementById("payment").innerHTML = payment;
-			// purchaseData(clientRecord);
+			document.getElementById("lookupName").addEventListener("click",function(){
+				document.getElementById("payment").innerHTML = "";
+			});
+			return;
 
 		} else {
-			clientRecord.buySomething(5);
-			payment = "<div class = 'payment'>"+
-				"<p> " + lookupName + " transaction has been entered into the database " +  "</p>"
+			// clientRecord.buySomething(5);
+			payment = "<div class='payment'>"+
+				"<p> The transacation for" + lookupName + " has been entered into the database .</p>" +
 				"</div>"
 			document.getElementById("payment").innerHTML = payment;
-			purchaseData(clientRecord);
+			document.getElementById("lookupName").addEventListener("click",function(){
+				document.getElementById("payment").innerHTML = "";
+			});
+			purchaseData({
+				clientName 		: clientRecord.clientName,
+				purchaseAmount 	: 5
+			});
 		}
 
 		document.getElementById("lookupName").addEventListener("click",function(){
@@ -422,43 +461,47 @@
 
 //=========== This function is use a different purchase amount===========
 	
-	 	document.getElementById("purchaseAmountButton").addEventListener("click", function(){
-	 		purchaseAmount()
-	 	})
+ 	document.getElementById("purchaseAmountButton").addEventListener("click", function(){
+ 		purchaseAmount();
+ 	});
 	 
-		function purchaseAmount () {
-			var purchaseUpdate ="";
-			var lookupName = document.getElementById("lookupNameNew").value;
-			var purchaseNumber = document.getElementById("newNumber").value;
-			var clientRecord;
-			for (var i = 0; i < clientArray.length; i++){
-				if(lookupName === clientArray[i].clientName){
-					clientRecord = clientArray[i];
-				}
+	function purchaseAmount () {
+		var purchaseUpdate ="";
+		var lookupName = document.getElementById("lookupNameNew").value;
+		var purchaseNumber = document.getElementById("newNumber").value;
+		var clientRecord;
+		for (var i = 0; i < clientArray.length; i++){
+			if(lookupName === clientArray[i].clientName){
+				clientRecord = clientArray[i];
 			}
-			console.log(clientRecord);
-			if (!clientRecord) {
-				purchaseUpdate = "<div class = 'otherAmount'>" +
-				"<p> " + " Error: Client record not found with a name of " + lookupName + "</p>"
-				"</div>"
-				document.getElementById("otherAmount").innerHTML = purchaseUpdate;
-
-			} else {
-				clientRecord.buySomething(purchaseNumber);
-				purchaseUpdate = "<div class = 'otherAmount'>" +
-				"<p> " + " Purchase Complete for " + lookupName  + " in the amount of " + purchaseNumber + "</p>"
-				"</div>"
-				document.getElementById("otherAmount").innerHTML = purchaseUpdate;
-			}
-
-			document.getElementById("lookupNameNew").addEventListener("click",function(){
-				document.getElementById("otherAmount").innerHTML = "";
-			});
-			console.log("Updated client record: ", JSON.stringify(clientRecord, null, 4));
-			document.getElementById("lookupNameNew").value ="";
-			document.getElementById("newNumber").value = "";
-
 		}
+		console.log(clientRecord);
+		if (!clientRecord) {
+			purchaseUpdate = "<div class = 'otherAmount'>" +
+			"<p> " + " Error: Client record not found with a name of " + lookupName + "</p>"
+			"</div>"
+			document.getElementById("otherAmount").innerHTML = purchaseUpdate;
+
+		} else {
+			clientRecord.buySomething(purchaseNumber);
+			purchaseUpdate = "<div class = 'otherAmount'>" +
+			"<p> " + " Purchase Complete for " + lookupName  + " in the amount of " + purchaseNumber + "</p>"
+			"</div>"
+			document.getElementById("otherAmount").innerHTML = purchaseUpdate;
+			diffAmount({
+				clientName 		: clientRecord.clientName,
+				purchaseAmount 	: purchaseNumber
+			});
+		}
+
+		document.getElementById("lookupNameNew").addEventListener("click",function(){
+			document.getElementById("otherAmount").innerHTML = "";
+		});
+		console.log("Updated client record: ", JSON.stringify(clientRecord, null, 4));
+		document.getElementById("lookupNameNew").value ="";
+		document.getElementById("newNumber").value = "";
+
+	}
 
 //=========== transfers the amount from one client to another, it will also throw and error if no such client exists============
 

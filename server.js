@@ -19,18 +19,32 @@ server.register({
 })
 
 
-function checkDatabase(){
-	var sql_all= "SELECT * FROM clients";
-	connection.query(sql_all,function(err,results){
-		connection.end()
-		if(err){
-			console.log(err + "error all clients query");
-			reply({err:err});
-		} else{
-			reply({message:results});
-			console.log(results + "results from all clients query");
-		}
+function checkDatabase(cb){
+	var sql_all = "SELECT * FROM clients";
+	var connection = mysql.createConnection({
+		host:'localhost',
+		user:'root',
+		password:'Closeme1!',
+		database: 'clients'
 	});
+	connection.connect(function(err, results){
+		if(err){
+			console.log("error connecting to database in check database");
+			return cb(err);
+		} else {
+			connection.query(sql_all,function(err, results){
+				connection.end()
+				if (err){
+					console.log(err + "error all clients query");
+					cb({err:err});
+				} else {
+					cb(null, results);
+					console.log(results + "results from all clients query");
+				}
+			});
+		}
+	})
+		
 }
 
 server.route({
@@ -72,15 +86,20 @@ server.route({
 		});
 		connection.connect(function(err,results){
 			console.log("Connected!");
-			var dataValues = [request.payload.clientName, request.payload.referredBy, request.payload.creditBalance];
-			var sql = 'INSERT INTO clients (clientName, referral, balance) VALUES(?,?,?)';
+			var dataValues = [request.payload.clientName, request.payload.creditBalance, request.payload.eligibleForDiscount, request.payload.totalTransactions];
+			var sql = 'INSERT INTO clients (clientName, balance, eligibleDiscount, totaltransactions) VALUES(?,?,?,?)';
 			connection.query(sql,dataValues,function(err,results){
 				connection.end();
 				if(err){
-					reply ({err:err});
+					reply({err:err});
 				} else {
-					checkDatabase();
-					reply(results);
+					checkDatabase(function(err, results) {
+						if (err) {
+							return reply({err:err});
+						} else {
+							reply(results);
+						}
+					});
 				}
 			
 				console.log("Number of records inserted: " , results);
@@ -101,15 +120,25 @@ server.route({
 		});
 		connection.connect(function(err,results){
 			console.log(request.payload, "purchasedata payload");
-			var purchaseDataValues = [request.payload.clientName,request.payload.creditBalance];
-			var sql = 'UPDATE clients SET balance = balance-5 WHERE clientName =?';
-			connection.query(sql,purchaseDataValues,function(err,results){
-				// connection.end();
+			var purchaseDataValues = [request.payload.purchaseAmountrequest.payload.clientName];
+			var sql = 'UPDATE clients SET balance = balance-? WHERE clientName =?';
+			connection.query(sql,purchaseDataValues, function(err, results){
+				connection.end();
 				if(err){
 					reply({err:err});
-					console.log(err + "error from 2nd query");
-				} else {
-					checkDatabase(newData);
+					console.log(err + "error in /purchasedata");
+				} else { 					
+					checkDatabase(function(err, results){
+						if(err){
+							return reply({err: err});
+						} else {
+							if(results.length > 0){
+								reply(results);
+							} else {
+								reply();
+							}
+						}
+					});
 					console.log(results + "results from 2nd query")
 				}
 
