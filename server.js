@@ -198,7 +198,8 @@ server.route({
 		});
 		connection.connect(function(err,results){
 			console.log(request.payload, "purchasedata payload");
-			var purchaseDataValues = [ request.payload.balance, request.payload.toClientName] ;
+			var purchaseDataValues = [ request.payload.amount, request.payload.toClientName] ;
+			console.log(request.payload.amount, request.payload.toClientName);
 			var sql = 'UPDATE clients SET balance = balance + ? WHERE clientName = ?';
 			connection.query(sql,purchaseDataValues, function(err, results){
 				// connection.end();
@@ -206,7 +207,7 @@ server.route({
 					reply({err:err});
 					console.log(err + "error in transfer first query");
 				} else { 
-					var secondDataValues = [request.payload.balance, request.payload.fromClientName];
+					var secondDataValues = [request.payload.amount, request.payload.fromClientName];
 					var msql = 'UPDATE clients SET balance = balance - ? WHERE clientName = ?';
 					connection.query(msql,secondDataValues, function(err, results){
 						connection.end();
