@@ -120,7 +120,7 @@ server.route({
 		});
 		connection.connect(function(err,results){
 			console.log(request.payload, "purchasedata payload");
-			var purchaseDataValues = [request.payload.purchaseAmountrequest.payload.clientName];
+			var purchaseDataValues = [request.payload.purchaseAmount, request.payload.clientName];
 			var sql = 'UPDATE clients SET balance = balance-? WHERE clientName =?';
 			connection.query(sql,purchaseDataValues, function(err, results){
 				connection.end();
@@ -148,16 +148,90 @@ server.route({
 });
 
 server.route({
-	method:'GET',
-	path:'/sup/{valueFromBrowser}',
-	handler: function(request, reply){
-		var browserValue = request.params.valueFromBrowser;
-		console.log(browserValue);
-		var replySentence = "Hey there " + browserValue + " , sup?";
-		reply({message:replySentence});
-	}
+	method:'POST',
+	path:'/diffdata',
+	handler:function(request,reply){
+		var connection = mysql.createConnection({
+			host:'localhost',
+			user:'root',
+			password:'Closeme1!',
+			database: 'clients'
+		});
+		connection.connect(function(err,results){
+			console.log(request.payload, "purchasedata payload");
+			var purchaseDataValues = [request.payload.purchaseAmount, request.payload.clientName];
+			var sql = 'UPDATE clients SET balance = balance-? WHERE clientName =?';
+			connection.query(sql,purchaseDataValues, function(err, results){
+				connection.end();
+				if(err){
+					reply({err:err});
+					console.log(err + "error in /purchasedata");
+				} else { 					
+					checkDatabase(function(err, results){
+						if(err){
+							return reply({err: err});
+						} else {
+							if(results.length > 0){
+								reply(results);
+							} else {
+								reply();
+							}
+						}
+					});
+					console.log(results + "results from 2nd query")
+				}
+
+			});
+		});		
+	}	
 });
 
+server.route({
+	method:'POST',
+	path:'/transfer',
+	handler:function(request,reply){
+		var connection = mysql.createConnection({
+			host:'localhost',
+			user:'root',
+			password:'Closeme1!',
+			database: 'clients'
+		});
+		connection.connect(function(err,results){
+			console.log(request.payload, "purchasedata payload");
+			var purchaseDataValues = [ request.payload.balance, request.payload.toClientName] ;
+			var sql = 'UPDATE clients SET balance = balance + ? WHERE clientName = ?';
+			connection.query(sql,purchaseDataValues, function(err, results){
+				// connection.end();
+				if(err){
+					reply({err:err});
+					console.log(err + "error in transfer first query");
+				} else { 
+					var secondDataValues = [request.payload.balance, request.payload.fromClientName];
+					var msql = 'UPDATE clients SET balance = balance - ? WHERE clientName = ?';
+					connection.query(msql,secondDataValues, function(err, results){
+						connection.end();
+						if (err){
+							reply({err:err});
+							console.log(err + "error in transfer 2nd query");
+						}else {
+							checkDatabase(function(err,results){
+								if(err){
+									return reply({err:err});
+								} else {
+									if(results.length > 0){
+										reply(results);
+									}else{
+										reply();
+									}
+								}
+							});
+						}
+					});
+				}				
+			});
+		});		
+	}	
+});
 server.route({
 	method:'GET',
 	path:'/multiply_one_by_the_other/{multiplyThis}/{byThis}',

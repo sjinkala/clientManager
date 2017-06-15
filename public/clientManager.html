@@ -110,7 +110,7 @@
 		<input type="button" value="purchase" id="purchaseAmountButton">
 		<div id="otherAmount"></div>
 		<br></br>
-		<label> Search</label>
+		<label>Transfer balance</label>
 		<input type="text" id="fromClient" placeholder="from Client">
 		<input type="text" id="toClient" placeholder="to Client">
 		<input type="number" id="otherquanity" value= "" placeholder="Amount">
@@ -237,13 +237,13 @@
 	// 	purchaseAmount 	: [number]
 	// }
 
-	function purchaseData(clientNameAndAmount){
+	function purchaseData(clientNameAmount){
 		$.ajax({
 			url:'/purchasedata',
 			method: 'POST',
 			dataType: 'json',
 			contentType: "application/json",
-			data:JSON.stringify(clientRecord),
+			data:JSON.stringify(clientNameAmount),
 			success:function(data){
 				if(data.err){
 					console.log(data.err);
@@ -259,12 +259,13 @@
 		});
 	}
 
-	function diffAmount(clientNameandDiiffAmmount){
+	function diffAmount(clientNameandDiffAmount){
 		$.ajax({
-			url:'/purchasedata',
+			url:'/diffdata',
 			method:'POST',
 			dataType: 'json',
-			data:JSON.stringify(clientRecord),
+			contentType: "application/json",
+			data:JSON.stringify(clientNameandDiffAmount),
 			success:function(data){
 				if(data.err){
 					console.log(data.err);
@@ -278,6 +279,28 @@
 			error:function(err){
 				console.log(err);
 			}
+		});
+	}
+
+	function transferBalance(clientNamesAndAmount){
+		$.ajax({
+			url:'/transfer',
+			method:'POST',
+			dataType:'json',
+			contentType:"application/json",
+			data:JSON.stringify(clientNamesAndAmount),
+			success: function(data){
+				if(data.err){
+					console.log(data.err);
+				}else{
+					transferBalance(data);
+					console.log("transfer successful", data);
+				}
+				console.log("transfer complete", data);
+			},
+			error:function(err){
+				console.log(err);
+			}	
 		});
 	}
 
@@ -536,8 +559,13 @@
 			return console.log("no client records found with a name of " + lookupSecond);	
 		}
 		else {
-			transferAmount(quanity);
-		}	
+			// transferAmount(quantity);
+			transferBalance({
+				toclientName  : toClientRecord.clientName,
+				fromClientName: fromClientRecord.clientName,
+				amount        : quanity
+			});
+		}
 
 		console.log("Updated client record: ", JSON.stringify(toClientRecord, null, 4));
 		console.log("Updated client record: ", JSON.stringify(fromClientRecord, null, 4));
@@ -545,14 +573,13 @@
 		document.getElementById("toClient").value = " ";
 		document.getElementById("otherquanity").value = "";
 			
-		function transferAmount(){
-			toClientRecord.creditBalance = toClientRecord.creditBalance + quanity;
-			fromClientRecord.creditBalance = fromClientRecord.creditBalance - quanity;
-		}	
+		// function transferAmount(){
+		// 	toClientRecord.creditBalance = toClientRecord.creditBalance + quanity;
+		// 	fromClientRecord.creditBalance = fromClientRecord.creditBalance - quanity;
+		// }	
 	
 		return toClientRecord;
 		return fromClientRecord;	
-		console.log(fromClientRecord);
 	}
 
 	// this looks up the client record and displays into a div
