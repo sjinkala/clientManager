@@ -274,7 +274,7 @@
 					purchaseAmount(data);
 					console.log("it worked", data);
 				}
-				console.log("different amount added",data);
+				console.log("different amount added", data);
 			},
 			error:function(err){
 				console.log(err);
@@ -282,7 +282,7 @@
 		});
 	}
 
-	function transferBalance(clientNamesAndAmount){
+	function transferBalances(clientNamesAndAmount){
 		$.ajax({
 			url:'/transfer',
 			method:'POST',
@@ -293,8 +293,8 @@
 				if(data.err){
 					console.log(data.err);
 				}else{
-					transferBalance(data);
-					console.log("transfer successful", data);
+					transfer(data);
+					// console.log("transfer successful", data);
 				}
 				console.log("transfer complete", data);
 			},
@@ -534,7 +534,7 @@
 	});
 
 
-	function transfer () {
+	function transfer() {
 		var quanity = document.getElementById("otherquanity").value * 1;
 		var lookupClient = document.getElementById("fromClient").value;
 		var lookupSecond = document.getElementById("toClient").value;
@@ -546,7 +546,7 @@
 			}
 			
 			if (lookupSecond === clientArray[i].clientName){
-					toClientRecord = clientArray[i];
+				toClientRecord = clientArray[i];
 			}		
 		}
 
@@ -556,14 +556,14 @@
 			return console.log("no client records found with a name of " + lookupClient);	
 		}
 		if(!toClientRecord){
+		
 			return console.log("no client records found with a name of " + lookupSecond);	
-		}
-		else {
+		} else {
 			// transferAmount(quantity);
-			transferBalance({
+			transferBalances({
 				toClientName  : toClientRecord.clientName,
 				fromClientName: fromClientRecord.clientName,
-				amount        : quanity
+				amount: quanity
 			});
 		}
 
