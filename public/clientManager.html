@@ -304,6 +304,28 @@
 		});
 	}
 
+	function findClients(clientName){
+		$.ajax({
+			url:'/find',
+			method:'POST',
+			dataType:'json',
+			contentType:"application/json",
+			data:JSON.stringify(clientName),
+			success: function(data){
+				if(data.err){
+					console.log(data.err);
+				}else{
+					findClient(data);
+					// console.log("transfer successful", data);
+				}
+				console.log("found client", data);
+			},
+			error:function(err){
+				console.log(err);
+			}	
+		});
+	}
+
 
 	function databaseValues(clientRecordArray){
 		var newData = [];
@@ -606,6 +628,12 @@
 				"</div>"
 				document.getElementById("find-Customer").innerHTML = print;
 				customerFound = true;
+				findClients({
+					clientName 		: clientArray[i].clientName,
+					// creditBalance 	: clientArray[i].creditBalance,
+					// totaltransactions : clientArray[i].totalTransactions,
+					// eligibleDiscount : clientArray[i].eligibleForDiscount
+				});
 			} 
 
 			if (customerFound === false) {
@@ -614,8 +642,7 @@
 				"</div>"
 				document.getElementById("find-Customer").innerHTML = print;
 			}		
-		}
-			document.getElementById("lookupClient").value = "";
+		}	document.getElementById("lookupClient").value = "";
 	}		
 //======This function populates the edit input fields===========		
 	function showEditFields (){	
