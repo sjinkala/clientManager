@@ -247,7 +247,45 @@ server.route({
 		connection.connect(function(err,results){
 			console.log(request.payload, "find payload");
 			var purchaseDataValues = [request.payload.clientName];
-			var sql = 'SELECT * FROM clients WHERE clientName = ?';
+			var sql = 'SELECT * FROM clients WHERE clientName = ?' ;
+			connection.query(sql,purchaseDataValues, function(err, results){
+				connection.end();
+				if(err){
+					reply({err:err});
+					console.log(err + "error in /find");
+				} else { 					
+					checkDatabase(function(err, results){
+						if(err){
+							return reply({err: err});
+						} else {
+							if(results.length > 0){
+								reply(results);
+							} else {
+								reply();
+							}
+						}
+					});
+					console.log(results + "results from find")
+				}
+
+			});
+		});		
+	}	
+});
+server.route({
+	method:'POST',
+	path:'/savedata',
+	handler:function(request,reply){
+		var connection = mysql.createConnection({
+			host:'localhost',
+			user:'root',
+			password:'Closeme1!',
+			database: 'clients'
+		});
+		connection.connect(function(err,results){
+			console.log(request.payload, "savepayload");
+			var dataValues = [request.payload.clientName, request.payload.creditBalance, request.payload.eligibleForDiscount, request.payload.totalTransactions];
+			var sql = 'UPDATE clients SET clientName =? balance=?, eligibleDiscount=?, totaltransactions=?';
 			connection.query(sql,purchaseDataValues, function(err, results){
 				connection.end();
 				if(err){

@@ -315,7 +315,7 @@
 				if(data.err){
 					console.log(data.err);
 				}else{
-					findClient(data);
+					databaseValues(data);
 					// console.log("transfer successful", data);
 				}
 				console.log("found client", data);
@@ -325,6 +325,30 @@
 			}	
 		});
 	}
+
+
+	function saveEditedData(clientRecord){
+		$.ajax({
+			url:'/savedata',
+			method:'POST',
+			dataType:'json',
+			contentType:"application/json",
+			data:JSON.stringify(clientRecord),
+			success: function(data){
+				if(data.err){
+					console.log(data.err);
+				}else{
+					saveData(data);
+					// console.log("transfer successful", data);
+				}
+				console.log("Data saved", data);
+			},
+			error:function(err){
+				console.log(err);
+			}	
+		});
+	}
+
 
 
 	function databaseValues(clientRecordArray){
@@ -562,7 +586,7 @@
 		var lookupSecond = document.getElementById("toClient").value;
 		var fromClientRecord;
 		var toClientRecord;
-		for (var i = 0; i < clientArray.length; i++) {
+		for (var i = 0; i < clientArray.length; i++){
 			if (lookupClient === clientArray[i].clientName){
 				fromClientRecord = clientArray[i];
 			}
@@ -626,24 +650,27 @@
 				"<p> Total Transactions: " + clientArray[i].totalTransactions + "</p>" +
 				"<p> Eligible for Discount: " + clientArray[i].eligibleForDiscount + "</p>"
 				"</div>"
+
 				document.getElementById("find-Customer").innerHTML = print;
 				customerFound = true;
-				findClients({
-					clientName 		: clientArray[i].clientName,
-					// creditBalance 	: clientArray[i].creditBalance,
-					// totaltransactions : clientArray[i].totalTransactions,
-					// eligibleDiscount : clientArray[i].eligibleForDiscount
-				});
-			} 
+				databaseValues(customer);
+				return;
+			}
 
 			if (customerFound === false) {
 				print ="<div class = 'find-Customer'>"+
 				"<p> Customer Not Found " +  customer + "</p>"
 				"</div>"
 				document.getElementById("find-Customer").innerHTML = print;
+				return;
 			}		
-		}	document.getElementById("lookupClient").value = "";
-	}		
+		}
+	}
+	document.getElementById("lookupClient").addEventListener("click",function(){
+		document.getElementById("find-Customer").innerHTML = "";
+		document.getElementById("lookupClient").value = "";
+	});
+		
 //======This function populates the edit input fields===========		
 	function showEditFields (){	
 		for (var i = 0; i < clientArray.length; i++) {
@@ -697,8 +724,10 @@
 				"<p> Client Updated " + clientArray[i].clientName + "</p>" +
 				"</div>"
 				document.getElementById("find-Customer").innerHTML = recordUpdate;
+				saveEditedData();
+				sendToCloud(client);
 			}
-		}	
+		}
 		document.getElementById("showLookEditButton").innerHTML = "";
 		cancelEdit();
 				
