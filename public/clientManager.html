@@ -654,7 +654,6 @@
 				document.getElementById("find-Customer").innerHTML = print;
 				customerFound = true;
 				databaseValues(customer);
-				return;
 			}
 
 			if (customerFound === false) {
@@ -662,10 +661,10 @@
 				"<p> Customer Not Found " +  customer + "</p>"
 				"</div>"
 				document.getElementById("find-Customer").innerHTML = print;
-				return;
 			}		
 		}
 	}
+	
 	document.getElementById("lookupClient").addEventListener("click",function(){
 		document.getElementById("find-Customer").innerHTML = "";
 		document.getElementById("lookupClient").value = "";
