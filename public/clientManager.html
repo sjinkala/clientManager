@@ -635,6 +635,7 @@
 	document.getElementById("findShowButton").addEventListener("click", function(){
 		findClient();
 		showEdit();
+		databaseValues();
 	})
 
 	function findClient(){
@@ -642,7 +643,7 @@
 		var error = "";
 		var print = "";
 		var customerFound = false;
-		for (var i = 0; i < clientArray.length; i++) {
+		for (var i = 0; i < clientArray.length; i++){
 			if (customer === clientArray[i].clientName){
 				print = "<div class ='find-Customer'>"+
 				"<p> Client Name: " + clientArray[i].clientName + "</p>" +
@@ -653,22 +654,24 @@
 
 				document.getElementById("find-Customer").innerHTML = print;
 				customerFound = true;
-				databaseValues(customer);
-			}
-
-			if (customerFound === false) {
-				print ="<div class = 'find-Customer'>"+
-				"<p> Customer Not Found " +  customer + "</p>"
-				"</div>"
-				document.getElementById("find-Customer").innerHTML = print;
+				// databaseValues(customer);
+				document.getElementById("lookupClient").addEventListener("click",function(){
+					document.getElementById("find-Customer").innerHTML = "";
+					document.getElementById("lookupClient").value = "";
+				});
 			}		
+		}	
+		if(customerFound === false) {
+			error ="<div class = 'find-Customer'>"+
+			"<p> Customer Not Found " +  customer + "</p>"
+			"</div>"
+			document.getElementById("find-Customer").innerHTML = error;
+			document.getElementById("lookupClient").addEventListener("click",function(){
+				document.getElementById("find-Customer").innerHTML = "";
+				document.getElementById("lookupClient").value = "";
+			});	
 		}
-	}
-	
-	document.getElementById("lookupClient").addEventListener("click",function(){
-		document.getElementById("find-Customer").innerHTML = "";
-		document.getElementById("lookupClient").value = "";
-	});
+	}	
 		
 //======This function populates the edit input fields===========		
 	function showEditFields (){	
