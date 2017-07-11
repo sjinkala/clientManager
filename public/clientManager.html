@@ -369,11 +369,12 @@
 		});
 	}
 
-	function referralRecord(cb){
+	function referralRecord(referral,cb){
 		$.ajax({
 			url:'/leaderboard',
 			method:'GET',
 			dataType:'json',
+			data:JSON.stringify(referral),
 			contentType:"application/json",
 			success: function(data){
 				if(data.err) {
@@ -382,7 +383,7 @@
 				} else {
 					cb(null,data);
 				}
-				console.log("leaderBoard", data);
+				console.log("referral", data);
 			},
 			error:function(err){
 				console.log("referral",err);
@@ -403,9 +404,9 @@
 				console.log(data.err);
 				cb(data.err);
 			} else {
-				cb(null,data);
+				cb(null,null,data);
 			}
-			console.log("leaderBoard", data);
+			console.log("referralRecord", data);
 		},
 		error:function(err){
 			console.log("referral",err);
@@ -909,36 +910,35 @@
 	}
 
 
-	function addReferral(referralSource, referrals){
-		var referralNoMatch = "";
-		var noMatch = false;
-		for (var i= 0; i < clientArray.length; i++){
-			if (referralSource === clientArray[i].clientName) {
-				clientArray[i].referrals.push(referrals);
-				noMatch = true;
-			}
-		}
-			if (noMatch === false){
-			referralNoMatch = "<div class = 'warningMessage'>"+
-			"<p> Error, the client you have entered " + referralSource + " is not in the system " + "</p>"
-			"</div>"
-			document.getElementById("warningMessage").innerHTML = referralNoMatch;
-			document.getElementById("name").addEventListener("click", function(){
-			document.getElementById("warningMessage").innerHTML = "";
-			});
+	// function addReferral(referralSource, referrals){
+	// 	var referralNoMatch = "";
+	// 	var noMatch = false;
+	// 	for (var i= 0; i < clientArray.length; i++){
+	// 		if (referralSource === clientArray[i].clientName) {
+	// 			clientArray[i].referrals.push(referrals);
+	// 			noMatch = true;
+	// 		}
+	// 	}
+	// 		if (noMatch === false){
+	// 		referralNoMatch = "<div class = 'warningMessage'>"+
+	// 		"<p> Error, the client you have entered " + referralSource + " is not in the system " + "</p>"
+	// 		"</div>"
+	// 		document.getElementById("warningMessage").innerHTML = referralNoMatch;
+	// 		document.getElementById("name").addEventListener("click", function(){
+	// 		document.getElementById("warningMessage").innerHTML = "";
+	// 		});
 
-		}
-	}
+	// 	}
+	// }
 
 	function addReferral(referralSource,referrals){
 		var referralNoMatch = "";
-		referralRecord(function(err,data){
+		referralRecord({
+			referredBy: referrals,
+			clientName: referralSource,
+		},(function(err,data){
 			if (err){
 				console.log("error");
-			}else {
-				for (var i = 0; i < data.length; i++){
-					console.log(data);
-				}
 				referralNoMatch = "<div class = 'warningMessage'>"+
 				"<p> Error, the client you have entered " + referralSource + " is not in the system " + "</p>"
 				"</div>"
@@ -946,11 +946,28 @@
 				document.getElementById("name").addEventListener("click", function(){
 					document.getElementById("warningMessage").innerHTML = "";
 				});
+			}else {
+				for (var i = 0; i < data.length; i++){
+					if(referralSource === data[i].clientName){
+						console.log(referralSource);
+						referralNoMatch = "<div class = 'warningMessage'>"+
+						"<p> the client you have entered " + referralSource + " has been added into the system " + "</p>"
+						"</div>"
+						document.getElementById("warningMessage").innerHTML = referralNoMatch;
+						document.getElementById("name").addEventListener("click", function(){
+							document.getElementById("warningMessage").innerHTML = "";
+						});
+					}
+				}
 
-			}
-		})
+			};
+		}));
 
 	}
+
+
+
+
 
 	function creditReferralBonus(referral, amount){
 		for (var i = 0; i < clientArray.length; i++) {
@@ -963,19 +980,19 @@
 
 
 
-	function creditReferralBonus(referral,amount){
-		var amount;
-		creditRefferalData({ amount: *5 })
-		, function(err,data){
-			if (err){
-				console.log(err);
-			}else{
-				for (var i = 0; i < data.length; i++) {
-				}
-				console.log(data);
-			}
-		}
-	}
+	// function creditReferralBonus(referral,amount){
+	// 	var amount;
+	// 	creditRefferalData({ amount: })
+	// 	, function(err,data){
+	// 		if (err){
+	// 			console.log(err);
+	// 		}else{
+	// 			for (var i = 0; i < data.length; i++) {
+	// 			}
+	// 			console.log(data);
+	// 		}
+	// 	}
+	// }
 
 
 

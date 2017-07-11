@@ -319,6 +319,63 @@ server.route({
 	}	
 });
 
+server.route({
+	method:'POST',
+	path:'/referralRecord',
+	handler:function(request,reply){
+		var connection = mysql.createConnection({
+			host:'localhost',
+			user:'root',
+			password:'Closeme1!',
+			database: 'clients'
+		});
+		connection.connect(function(err,results){
+			console.log(request.payload, "find payload");
+			var purchaseDataValues = [request.payload.referredBy, request.payload.clientName];
+			var sql = 'UPDATE clients SET referredBy = ? WHERE clientName = ?'
+			connection.query(sql,purchaseDataValues, function(err, results){
+				connection.end();
+				if(err){
+					reply({err:err});
+					console.log(err + "error in /referralRecord");
+				} else { 					
+					reply(results);
+				}
+				console.log(results + "results from referralRecord")
+			});
+		});		
+	}	
+});
+
+server.route({
+	method:'POST',
+	path:'/creditRefferalData',
+	handler:function(request,reply){
+		var connection = mysql.createConnection({
+			host:'localhost',
+			user:'root',
+			password:'Closeme1!',
+			database: 'clients'
+		});
+		connection.connect(function(err,results){
+			console.log(request.payload, "find payload");
+			var purchaseDataValues = [request.payload.clientName];
+			var sql = 'UPDATE clients SET balance = ? WHERE clientName = ?'
+			connection.query(sql,purchaseDataValues, function(err, results){
+				connection.end();
+				if(err){
+					reply({err:err});
+					console.log(err + "error in /find");
+				} else { 					
+					reply(results);
+				}
+				console.log(results + "results from find")
+			});
+		});		
+	}	
+});
+
+
 
 
 server.route({
