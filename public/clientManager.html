@@ -175,12 +175,7 @@
 		<div id="clearLeaderBoard" class="board-clear">
 			<input type="button" value="clear" id="clearButton">
 		</div>	
-		<div>
-			<input type="text" placeholder="random" id="textInput">
-			<input type="button" value="test Ajax" id="testAjax">
-			<input type="button" value="quadrify input" id="quadInput">
-			<input type="button" value="test data" id="sendToCloud1">
-		</div>	
+
 
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"</script>
 	<script src = "server.js"</script>
@@ -304,7 +299,7 @@
 		});
 	}
 
-	function findClients(customer){
+	function findClientData(customer, cb){
 		$.ajax({
 			url:'/find',
 			method:'POST',
@@ -312,22 +307,23 @@
 			contentType:"application/json",
 			data:JSON.stringify(customer),
 			success: function(data){
-				if(data.err){
+				if(data.err) {
 					console.log(data.err);
-				}else{
-					databaseValues(data);
-					// console.log("transfer successful", data);
+					cb(data.err);
+				} else {
+					cb(null,data);
 				}
 				console.log("found client", data);
 			},
 			error:function(err){
-				console.log(err);
+				console.log("error in findClientData",err);
+				cb(err);
 			}	
 		});
 	}
 
 
-	function saveEditedData(clientRecord){
+	function saveNewData(clientRecord, cb){
 		$.ajax({
 			url:'/savedata',
 			method:'POST',
@@ -337,17 +333,86 @@
 			success: function(data){
 				if(data.err){
 					console.log(data.err);
+					cb(data.err);
 				}else{
-					saveData(data);
+					cb(null,data);
 					// console.log("transfer successful", data);
 				}
 				console.log("Data saved", data);
 			},
 			error:function(err){
-				console.log(err);
+				console.log("error in save data",err);
+				cb(err);
 			}	
 		});
 	}
+
+	function leaderBoardRecord(cb){
+		$.ajax({
+			url:'/leaderboard',
+			method:'GET',
+			dataType:'json',
+			contentType:"application/json",
+			success: function(data){
+				if(data.err) {
+					console.log(data.err);
+					cb(data.err);
+				} else {
+					cb(null,data);
+				}
+				console.log("leaderBoard", data);
+			},
+			error:function(err){
+				console.log("error in leaderBoard",err);
+				cb(err);
+			}	
+		});
+	}
+
+	function referralRecord(cb){
+		$.ajax({
+			url:'/leaderboard',
+			method:'GET',
+			dataType:'json',
+			contentType:"application/json",
+			success: function(data){
+				if(data.err) {
+					console.log(data.err);
+					cb(data.err);
+				} else {
+					cb(null,data);
+				}
+				console.log("leaderBoard", data);
+			},
+			error:function(err){
+				console.log("referral",err);
+				cb(err);
+			}	
+		});
+	}
+
+	function creditRefferalData(amount,client,cb){
+	$.ajax({
+		url:'/leaderboard',
+		method:'GET',
+		dataType:'json',
+		data:JSON.stringify(amount),
+		contentType:"application/json",
+		success: function(data){
+			if(data.err) {
+				console.log(data.err);
+				cb(data.err);
+			} else {
+				cb(null,data);
+			}
+			console.log("leaderBoard", data);
+		},
+		error:function(err){
+			console.log("referral",err);
+			cb(err);
+		}	
+	});
+}
 
 
 
@@ -449,7 +514,6 @@
 		
 	document.getElementById("newClientButton").addEventListener("click", function(){
 		createNewClient();
-			// sendToCloud(newClient);
 	});
 
 	function newClientConstructor (name,referral, _clientObj) {
@@ -618,11 +682,7 @@
 		document.getElementById("fromClient").value = "";
 		document.getElementById("toClient").value = " ";
 		document.getElementById("otherquanity").value = "";
-			
-		// function transferAmount(){
-		// 	toClientRecord.creditBalance = toClientRecord.creditBalance + quanity;
-		// 	fromClientRecord.creditBalance = fromClientRecord.creditBalance - quanity;
-		// }	
+				
 	
 		return toClientRecord;
 		return fromClientRecord;	
@@ -633,45 +693,46 @@
 
 
 	document.getElementById("findShowButton").addEventListener("click", function(){
-		findClient();
+		findClient(); 
 		showEdit();
 	})
 
+
 	function findClient(){
 		var customer = document.getElementById("lookupClient").value;
-		var error = "";
-		var print = "";
-		var customerFound = false;
-		console.log(clientArray);
-		for (var i = 0; i < clientArray.length; i++){
-			if (customer === clientArray[i].clientName){
-				print = "<div class ='find-Customer'>"+
-				"<p> Client Name: " + clientArray[i].clientName + "</p>" +
-				"<p> Account Balance: " + clientArray[i].creditBalance + "</p>" +
-				"<p> Total Transactions: " + clientArray[i].totalTransactions + "</p>" +
-				"<p> Eligible for Discount: " + clientArray[i].eligibleForDiscount + "</p>"
-				"</div>"
-
-				document.getElementById("find-Customer").innerHTML = print;
-				customerFound = true;
-				findClients(customer);
-				document.getElementById("lookupClient").addEventListener("click",function(){
-					document.getElementById("find-Customer").innerHTML = "";
-					document.getElementById("lookupClient").value = "";
-				});
-			}		
-		}	
-		if(customerFound === false) {
-			error ="<div class = 'find-Customer'>"+
+		findClientData({
+			clientName : customer
+		}, function(err, data) {
+		if (err) {
+			console.log(err, "error in finding data in findClient");
+			var error ="<div class = 'find-Customer'>"+
 			"<p> Customer Not Found " +  customer + "</p>"
 			"</div>"
 			document.getElementById("find-Customer").innerHTML = error;
 			document.getElementById("lookupClient").addEventListener("click",function(){
 				document.getElementById("find-Customer").innerHTML = "";
 				document.getElementById("lookupClient").value = "";
-			});	
-		}
+			});
+		} else {
+			for (var i = 0; i < data[i].length; i++){
+					console.log(data[i].clientName)
+				}
+				var print = "<div class ='find-Customer'>"+
+				"<p> Client Name: " + data[i].clientName + "</p>" +
+				"<p> Account Balance: " + data[i].balance + "</p>" +
+				"<p> Total Transactions: " + data[i].eligibleDiscount + "</p>" +
+				"<p> referredBy: " + data[i].referredBy + "</p>" +
+				"<p> Eligible for Discount: " + data[i].totaltransactions + "</p>"
+				"</div>"
+			}	
+			document.getElementById("find-Customer").innerHTML = print;
+			document.getElementById("lookupClient").addEventListener("click",function(){
+				document.getElementById("find-Customer").innerHTML = "";
+				document.getElementById("lookupClient").value = "";
+			});
+		});
 	}	
+
 		
 //======This function populates the edit input fields===========		
 	function showEditFields (){	
@@ -713,38 +774,35 @@
 		var customer = document.getElementById("lookupClient").value;
 		var clientName = document.getElementById("edit-Company").value;
 		var creditBalance = document.getElementById("edit-Balance").value;
-		var totalTransactions = document.getElementById("total-Transactions").value;
+		var totaltransactions = document.getElementById("total-Transactions").value;
 		var eligibleForDiscount = document.getElementById("eligible-Discount").value;
 		var recordUpdate = "";
-		for (var i = 0; i < clientArray.length; i++) {
-			if (clientArray[i].clientName === customer) {
-				clientArray[i].clientName = clientName;
-				clientArray[i].creditBalance = creditBalance;
-				clientArray[i].totalTransactions = totalTransactions;
-				clientArray[i].eligibleForDiscount = eligibleForDiscount;
-				var recordUpdate = "<div class ='find-Customer'>"+
-				"<p> Client Updated " + clientArray[i].clientName + "</p>" +
-				"</div>"
-				document.getElementById("find-Customer").innerHTML = recordUpdate;
-				saveEditedData();
-				sendToCloud(client);
-			}
-		}
-		document.getElementById("showLookEditButton").innerHTML = "";
-		cancelEdit();
-				
+		saveNewData({
+			clientName: customer,
+			creditBalance : creditBalance,
+			eligibleForDiscount: eligibleForDiscount,
+			totaltransactions: totaltransactions,
+		}, function(err, data) {
+			if (err) {
+				console.log("error in save Data")
+			}else{
+				for (var i = 0; i < data.length; i++) {
+					if (data[i].clientName === customer) {
+						data[i].clientName = clientName;
+						data[i].balance = creditBalance;
+						data[i].eligibleDiscount = eligibleForDiscount;
+						data[i].totaltransactions = totaltransactions;
+						var recordUpdate = "<div class ='find-Customer'>"+
+						"<p> Client Updated " + data[i].clientName + "</p>" +
+						"</div>"
+						document.getElementById("find-Customer").innerHTML = recordUpdate;
+						sendToCloud(client);
+					}
+				}	
+			}	
+		});
 	}
 
-	
-
-	// document.getElementById("saveDataButton").addEventListener("click", function(){
-	// 	saveData();
-	// });	
-
-			
-	
-
-//======This function Cancels the Edits=========	
 
 	document.getElementById("cancelEditButton").addEventListener("click", function(){
 		cancelEdit();
@@ -761,18 +819,16 @@
 		document.querySelectorAll('Edit-Section').value = "";
 		}
 	}
-
-//=======This function shows the edit Button==========		
+	
 	function showEdit(){
 	var show = document.querySelectorAll('.show-first');
 		for (var i = 0; i < show.length; i++) {
-			show[i].style.display = "initial";		
-			
-			
+			show[i].style.display = "initial";			
 		}
 	}
 
-//======This function hides the edit button================
+
+
 	function hide(){
 	var hideEdit = document.querySelectorAll('.Edit-Section');
 		for (var i = 0; i < hideEdit.length; i++) {
@@ -782,31 +838,54 @@
 
 
 	document.getElementById("leaderBoardDataButton").addEventListener("click", function(){
-		leaderBoardData();
+		leaderboardData();
 	})
 
-	function leaderBoardData(){
-		clientArray.sort(function(a,b){
-			return b.creditBalance - a.creditBalance;
+	// function leaderBoardData(){
+	// 	clientArray.sort(function(a,b){
+	// 		return b.creditBalance - a.creditBalance;
 
-		});
+	// 	});
+	// 	var showResults = "";
+	// 	var results = "";
+	// 	for (var i = 0; i < clientArray.length; i++) {
+	// 		document.getElementById("leaderBoard").innerHTML = results
+	// 		var showResults = "<div class ='display-leader'>"+
+	// 		"<p> Client Name: " + clientArray[i].clientName + "</p>" +
+	// 		"<p> Account Balance: " + clientArray[i].creditBalance + "</p>" +
+	// 		"</div>"
+	// 		results += showResults;
+	// 	}	
+	// 	clearBoard();
+	// 	document.getElementById("clearButton").addEventListener("click",function(){
+	// 	clearLeadBoard();
+	// 	hideEditB();
+	// 	})
+				
+	// }
+
+	function leaderboardData(){
 		var showResults = "";
 		var results = "";
-		for (var i = 0; i < clientArray.length; i++) {
-			document.getElementById("leaderBoard").innerHTML = results
-			var showResults = "<div class ='display-leader'>"+
-			"<p> Client Name: " + clientArray[i].clientName + "</p>" +
-			"<p> Account Balance: " + clientArray[i].creditBalance + "</p>" +
-			"</div>"
-			results += showResults;
-		}	
-		clearBoard();
-		document.getElementById("clearButton").addEventListener("click",function(){
-		clearLeadBoard();
-		hideEditB();
-		})
-				
+		leaderBoardRecord(function(err,data){
+			if(err){
+				console.log("error in leaderboard");
+			} else{
+				console.log(data, "data");
+				for (var i = 0; i < data.length; i++) {
+					document.getElementById("leaderBoard").innerHTML = results
+					showResults += "<div class ='display-leader'>"+
+					"<p> Client Name: " + data[i].clientName + "</p>" +
+					"<p> Account Balance: " + data[i].creditBalance + "</p>" +
+					"</div>"
+					results += showResults;
+				}
+			}					
+		});
+
 	}	
+
+
 
 
 
@@ -851,12 +930,50 @@
 		}
 	}
 
+	function addReferral(referralSource,referrals){
+		var referralNoMatch = "";
+		referralRecord(function(err,data){
+			if (err){
+				console.log("error");
+			}else {
+				for (var i = 0; i < data.length; i++){
+					console.log(data);
+				}
+				referralNoMatch = "<div class = 'warningMessage'>"+
+				"<p> Error, the client you have entered " + referralSource + " is not in the system " + "</p>"
+				"</div>"
+				document.getElementById("warningMessage").innerHTML = referralNoMatch;
+				document.getElementById("name").addEventListener("click", function(){
+					document.getElementById("warningMessage").innerHTML = "";
+				});
+
+			}
+		})
+
+	}
+
 	function creditReferralBonus(referral, amount){
 		for (var i = 0; i < clientArray.length; i++) {
 			if (referral === clientArray[i].clientName) {
 				amount = amount * 0.05;
 				clientArray[i].creditBalance = clientArray[i].creditBalance + amount
 			}		
+		}
+	}
+
+
+
+	function creditReferralBonus(referral,amount){
+		var amount;
+		creditRefferalData({ amount: *5 })
+		, function(err,data){
+			if (err){
+				console.log(err);
+			}else{
+				for (var i = 0; i < data.length; i++) {
+				}
+				console.log(data);
+			}
 		}
 	}
 

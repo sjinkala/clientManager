@@ -141,7 +141,6 @@ server.route({
 					});
 					console.log(results + "results from 2nd query")
 				}
-
 			});
 		});		
 	}	
@@ -254,24 +253,14 @@ server.route({
 					reply({err:err});
 					console.log(err + "error in /find");
 				} else { 					
-					checkDatabase(function(err, results){
-						if(err){
-							return reply({err: err});
-						} else {
-							if(results.length > 0){
-								reply(results);
-							} else {
-								reply();
-							}
-						}
-					});
-					console.log(results + "results from find")
+					reply(results);
 				}
-
+				console.log(results + "results from find")
 			});
 		});		
 	}	
 });
+
 server.route({
 	method:'POST',
 	path:'/savedata',
@@ -284,32 +273,54 @@ server.route({
 		});
 		connection.connect(function(err,results){
 			console.log(request.payload, "savepayload");
-			var dataValues = [request.payload.clientName, request.payload.creditBalance, request.payload.eligibleForDiscount, request.payload.totalTransactions];
-			var sql = 'UPDATE clients SET clientName =? balance=?, eligibleDiscount=?, totaltransactions=?';
-			connection.query(sql,purchaseDataValues, function(err, results){
+			var purchaseDataValues = [request.payload.creditBalance, request.payload.eligibleForDiscount, request.payload.totaltransactions, request.payload.clientName];
+			var sql = 'UPDATE clients SET balance= ?, eligibleDiscount= ?, totaltransactions = ? WHERE clientName = ?';
+			connection.query(sql, purchaseDataValues, function(err, results){
 				connection.end();
 				if(err){
 					reply({err:err});
-					console.log(err + "error in /find");
+					console.log(err + "error in /save");
 				} else { 					
-					checkDatabase(function(err, results){
-						if(err){
-							return reply({err: err});
-						} else {
-							if(results.length > 0){
-								reply(results);
-							} else {
-								reply();
-							}
-						}
-					});
-					console.log(results + "results from find")
+					reply(results);
+					console.log(results + "results from save");
 				}
 
 			});
 		});		
 	}	
 });
+
+server.route({
+	method:'GET',
+	path:'/leaderboard',
+	handler:function(request,reply){
+		var connection = mysql.createConnection({
+			host:'localhost',
+			user:'root',
+			password:'Closeme1!',
+			database: 'clients'
+		});
+		connection.connect(function (err, results) {
+			// console.log(request.payload, "leaderboard");
+			// var purchaseDataValues = [request.payload];
+			var sql = 'SELECT * FROM clients ORDER BY balance DESC';
+			connection.query(sql, function (err, results) {
+				connection.end();
+				if (err) {
+					reply({err:err});
+					console.log(err + "error in /leaderboard");
+				} else { 					
+					console.log(results + "results from leaderboard");
+					reply(results);
+				}
+
+			});
+		});		
+	}	
+});
+
+
+
 server.route({
 	method:'GET',
 	path:'/multiply_one_by_the_other/{multiplyThis}/{byThis}',
