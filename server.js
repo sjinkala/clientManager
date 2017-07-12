@@ -330,7 +330,7 @@ server.route({
 			database: 'clients'
 		});
 		connection.connect(function(err,results){
-			console.log(request.payload, "find payload");
+			console.log(request.payload, "referral payload");
 			var purchaseDataValues = [request.payload.referredBy, request.payload.clientName];
 			var sql = 'UPDATE clients SET referredBy = ? WHERE clientName = ?'
 			connection.query(sql,purchaseDataValues, function(err, results){
@@ -358,18 +358,20 @@ server.route({
 			database: 'clients'
 		});
 		connection.connect(function(err,results){
-			console.log(request.payload, "find payload");
-			var purchaseDataValues = [request.payload.clientName];
-			var sql = 'UPDATE clients SET balance = ? WHERE clientName = ?'
+			console.log(request.payload, "creditRefferalData");
+			var purchaseDataValues = [request.payload.amount, request.payload.clientName];
+			console.log(request.payload.amount, "creditRefferalData");
+			console.log(request.payload.clientName,"creditRefferalData");
+			var sql = 'UPDATE clients SET balance = amount * 0.05 + balance WHERE clientName = ?'
 			connection.query(sql,purchaseDataValues, function(err, results){
 				connection.end();
 				if(err){
 					reply({err:err});
-					console.log(err + "error in /find");
+					console.log(err + "error in /creditRefferalData");
 				} else { 					
 					reply(results);
 				}
-				console.log(results + "results from find")
+				console.log(results + "creditRefferalData")
 			});
 		});		
 	}	

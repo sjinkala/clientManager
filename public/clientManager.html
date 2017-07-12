@@ -371,8 +371,8 @@
 
 	function referralRecord(referral,cb){
 		$.ajax({
-			url:'/leaderboard',
-			method:'GET',
+			url:'/referralRecord',
+			method:'POST',
 			dataType:'json',
 			data:JSON.stringify(referral),
 			contentType:"application/json",
@@ -392,10 +392,10 @@
 		});
 	}
 
-	function creditRefferalData(amount,client,cb){
+	function creditRefferalData(amount,cb){
 	$.ajax({
-		url:'/leaderboard',
-		method:'GET',
+		url:'/creditRefferalData',
+		method:'POST',
 		dataType:'json',
 		data:JSON.stringify(amount),
 		contentType:"application/json",
@@ -404,12 +404,12 @@
 				console.log(data.err);
 				cb(data.err);
 			} else {
-				cb(null,null,data);
+				cb(null,data);
 			}
-			console.log("referralRecord", data);
+			console.log("creditRefferalData", data);
 		},
 		error:function(err){
-			console.log("referral",err);
+			console.log("creditRefferalData",err);
 			cb(err);
 		}	
 	});
@@ -498,11 +498,11 @@
 		if (collison === false){
 			clientArray.push(newClient);
 			addReferral(referredBy, newClientName);
-			warning = "<div class='warningMessage'>"+
-				"<p> The Customer " + newClientName + " has been entered into the database " +  "</p>" +
-				"</div>";
+			// warning = "<div class='warningMessage'>"+
+			// 	"<p> The Customer " + newClientName + " has been entered into the database " +  "</p>" +
+			// 	"</div>";
 
-			document.getElementById("warningMessage").innerHTML = warning;
+			// document.getElementById("warningMessage").innerHTML = warning;
 			document.getElementById("name").addEventListener("click",function(){
 				document.getElementById("warningMessage").innerHTML = "";
 			});
@@ -936,7 +936,7 @@
 		referralRecord({
 			referredBy: referrals,
 			clientName: referralSource,
-		},(function(err,data){
+		},function(err, data){
 			if (err){
 				console.log("error");
 				referralNoMatch = "<div class = 'warningMessage'>"+
@@ -946,53 +946,45 @@
 				document.getElementById("name").addEventListener("click", function(){
 					document.getElementById("warningMessage").innerHTML = "";
 				});
-			}else {
+			} else {
 				for (var i = 0; i < data.length; i++){
 					if(referralSource === data[i].clientName){
 						console.log(referralSource);
-						referralNoMatch = "<div class = 'warningMessage'>"+
-						"<p> the client you have entered " + referralSource + " has been added into the system " + "</p>"
-						"</div>"
-						document.getElementById("warningMessage").innerHTML = referralNoMatch;
-						document.getElementById("name").addEventListener("click", function(){
-							document.getElementById("warningMessage").innerHTML = "";
-						});
 					}
 				}
 
 			};
-		}));
-
+		});
 	}
 
 
 
 
 
-	function creditReferralBonus(referral, amount){
-		for (var i = 0; i < clientArray.length; i++) {
-			if (referral === clientArray[i].clientName) {
-				amount = amount * 0.05;
-				clientArray[i].creditBalance = clientArray[i].creditBalance + amount
-			}		
-		}
-	}
-
-
-
-	// function creditReferralBonus(referral,amount){
-	// 	var amount;
-	// 	creditRefferalData({ amount: })
-	// 	, function(err,data){
-	// 		if (err){
-	// 			console.log(err);
-	// 		}else{
-	// 			for (var i = 0; i < data.length; i++) {
-	// 			}
-	// 			console.log(data);
-	// 		}
+	// function creditReferralBonus(referral, amount){
+	// 	for (var i = 0; i < clientArray.length; i++) {
+	// 		if (referral === clientArray[i].clientName) {
+	// 			amount = amount * 0.05;
+	// 			clientArray[i].creditBalance = clientArray[i].creditBalance + amount
+	// 		}		
 	// 	}
 	// }
+
+
+
+	function creditReferralBonus(referral,amount){
+		// var amount;
+		creditRefferalData({ 
+		clientName: referral,
+		amount: amount })
+		, function(err,data){
+			if (err){
+				console.log(err);
+			}else{
+				console.log(data);
+			}
+		}
+	}
 
 
 
