@@ -535,8 +535,10 @@
 				if (this.totalTransactions > 5) {
 					this.eligibleForDiscount = true;
 				}
-				if (referral) {
+				if (referral | clientObj.referredBy) {
 					creditReferralBonus(referral,amount);
+					console.log(referral, "referral in newClientConstructor");
+					console.log(clientObj.referredBy, "object client.referredBy");
 				}
 			}
 		}
@@ -975,8 +977,9 @@
 	function creditReferralBonus(referral,amount){
 		// var amount;
 		creditRefferalData({ 
+			amount: amount,
 		clientName: referral,
-		amount: amount })
+		amount: amount, })
 		, function(err,data){
 			if (err){
 				console.log(err);

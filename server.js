@@ -2,6 +2,8 @@ const Hapi = require('hapi');
 const Good = require('good');
 var mysql = require('mysql');
 
+var referralBonusPercent = 0.05;
+
 
 
 
@@ -362,7 +364,7 @@ server.route({
 			var purchaseDataValues = [request.payload.amount, request.payload.clientName];
 			console.log(request.payload.amount, "creditRefferalData");
 			console.log(request.payload.clientName,"creditRefferalData");
-			var sql = 'UPDATE clients SET balance = amount * 0.05 + balance WHERE clientName = ?'
+			var sql = 'UPDATE clients SET balance = amount * referralBonusPercent + balance WHERE clientName = ?'
 			connection.query(sql,purchaseDataValues, function(err, results){
 				connection.end();
 				if(err){
