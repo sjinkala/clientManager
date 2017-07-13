@@ -369,7 +369,7 @@
 		});
 	}
 
-	function referralRecord(referral,cb){
+		function referralRecord(referral,cb){
 		$.ajax({
 			url:'/referralRecord',
 			method:'POST',
@@ -535,7 +535,7 @@
 				if (this.totalTransactions > 5) {
 					this.eligibleForDiscount = true;
 				}
-				if (referral | clientObj.referredBy) {
+				if (referral || clientObj.referredBy) {
 					creditReferralBonus(referral,amount);
 					console.log(referral, "referral in newClientConstructor");
 					console.log(clientObj.referredBy, "object client.referredBy");
@@ -936,8 +936,8 @@
 	function addReferral(referralSource,referrals){
 		var referralNoMatch = "";
 		referralRecord({
-			referredBy: referrals,
-			clientName: referralSource,
+			referredBy: referralSource,
+			clientName: referrals,
 		},function(err, data){
 			if (err){
 				console.log("error");
@@ -954,7 +954,6 @@
 						console.log(referralSource);
 					}
 				}
-
 			};
 		});
 	}

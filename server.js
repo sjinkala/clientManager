@@ -349,6 +349,7 @@ server.route({
 	}	
 });
 
+
 server.route({
 	method:'POST',
 	path:'/creditRefferalData',
