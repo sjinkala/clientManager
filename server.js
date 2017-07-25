@@ -333,9 +333,9 @@ server.route({
 		});
 		connection.connect(function(err,results){
 			console.log(request.payload, "referrals payload");
-			var purchaseDataValues = [request.payload.referredBy request.payload.clientName];
+			var referalDataValues = [request.payload.referredBy, request.payload.clientName];
 			var sql = 'UPDATE clients SET referredBy = ? WHERE clientName = ? ';
-			connection.query(sql,purchaseDataValues, function(err, results){
+			connection.query(sql, referalDataValues, function(err, results){
 				connection.end();
 				if(err){
 					reply({err:err});

@@ -517,14 +517,14 @@
 		createNewClient();
 	});
 
-	function newClientConstructor (name,referral, _clientObj) {
+	function newClientConstructor (name,referrals, _clientObj) {
 		var clientObj = _clientObj || {};
 		var client = {
 			clientName : name,
 			creditBalance : clientObj.balance || 100,
 			eligibleForDiscount : clientObj.eligibleDicount || false,
 			totalTransactions :clientObj.totaltransactions || 0,
-			referredBy: clientObj.referredBy || referral,
+			referredBy: clientObj.referredBy || referrals,
 			referrals: [],
 			buySomething : function (amount) {
 				if (this.eligibleForDiscount) {
@@ -535,7 +535,7 @@
 				if (this.totalTransactions > 5) {
 					this.eligibleForDiscount = true;
 				}
-				if (referral ||clientObj.referredBy) {
+				if (referrals ||clientObj.referredBy) {
 					creditReferralBonus(referral,amount);
 					console.log(referral, "referral in newClientConstructor");
 					console.log(clientObj.referredBy, "object client.referredBy");
@@ -933,10 +933,10 @@
 	// 	}
 	// }
 
-	function addReferral(referrals,referralSource){
+	function addReferral(referredBy,referrals){
 		var referralNoMatch = "";
 		referralRecord({
-			referredBy: referralSource,
+			referredBy: referredBy,
 			clientName: referrals,
 		},function(err, data){
 			if (err){
