@@ -332,9 +332,9 @@ server.route({
 			database: 'clients'
 		});
 		connection.connect(function(err,results){
-			console.log(request.payload, "referral payload");
-			var purchaseDataValues = [request.payload.referredBy, request.payload.clientName];
-			var sql = 'UPDATE clients SET referredBy = ? WHERE clientName = ?'
+			console.log(request.payload, "referrals payload");
+			var purchaseDataValues = [request.payload.referredBy request.payload.clientName];
+			var sql = 'UPDATE clients SET referredBy = ? WHERE clientName = ? ';
 			connection.query(sql,purchaseDataValues, function(err, results){
 				connection.end();
 				if(err){
@@ -348,7 +348,6 @@ server.route({
 		});		
 	}	
 });
-
 
 server.route({
 	method:'POST',
