@@ -88,8 +88,8 @@ server.route({
 		});
 		connection.connect(function(err,results){
 			console.log("Connected!");
-			var dataValues = [request.payload.clientName, request.payload.creditBalance, request.payload.eligibleForDiscount, request.payload.totalTransactions];
-			var sql = 'INSERT INTO clients (clientName, balance, eligibleDiscount, totaltransactions) VALUES(?,?,?,?)';
+			var dataValues = [request.payload.clientName, request.payload.creditBalance, request.payload.eligibleForDiscount, request.payload.totalTransactions, request.payload.referredBy];
+			var sql = 'INSERT INTO clients (clientName, balance, eligibleDiscount, totaltransactions, referredBy) VALUES(?,?,?,?,?)';
 			connection.query(sql,dataValues,function(err,results){
 				connection.end();
 				if(err){
@@ -334,7 +334,8 @@ server.route({
 		connection.connect(function(err,results){
 			console.log(request.payload, "referrals payload");
 			var referalDataValues = [request.payload.referredBy, request.payload.clientName];
-			var sql = 'UPDATE clients SET referredBy = ? WHERE clientName = ? ';
+			// var sql = 'UPDATE clients SET referredBy = ? WHERE clientName = ? ';
+			var sql = 'INSERT INTO clients (referredBy, clientName) VALUES(?,?)';
 			connection.query(sql, referalDataValues, function(err, results){
 				connection.end();
 				if(err){

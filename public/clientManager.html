@@ -418,6 +418,7 @@
 
 
 	function databaseValues(clientRecordArray){
+		var referredBy = document.getElementById('referrerName').value.toLowerCase().replace(/\s+/g, '');
 		var newData = [];
 		console.log(" before entering loop", JSON.stringify(clientRecordArray, null, 4));
 		console.log(clientRecordArray);
@@ -425,7 +426,7 @@
 		for (var i = 0; i < clientRecordArray.length; i++) {
 
 			console.log(clientRecordArray.clientName);
-			var client = newClientConstructor(clientRecordArray[i].clientName, null, clientRecordArray[i]);
+			var client = newClientConstructor(clientRecordArray[i].clientName, referredBy, clientRecordArray[i]);
 
 			// {
 			// 	clientName : clientRecordArray[i].clientName,
@@ -497,7 +498,7 @@
 		
 		if (collison === false){
 			clientArray.push(newClient);
-			addReferral(referredBy, newClientName);
+			// addReferral(referredBy, newClientName);
 			// warning = "<div class='warningMessage'>"+
 			// 	"<p> The Customer " + newClientName + " has been entered into the database " +  "</p>" +
 			// 	"</div>";
@@ -517,14 +518,14 @@
 		createNewClient();
 	});
 
-	function newClientConstructor (name,referrals, _clientObj) {
+	function newClientConstructor (name,referredBy, _clientObj) {
 		var clientObj = _clientObj || {};
 		var client = {
 			clientName : name,
 			creditBalance : clientObj.balance || 100,
 			eligibleForDiscount : clientObj.eligibleDicount || false,
 			totalTransactions :clientObj.totaltransactions || 0,
-			referredBy: clientObj.referredBy || referrals,
+			referredBy: clientObj.referredBy || referredBy,
 			referrals: [],
 			buySomething : function (amount) {
 				if (this.eligibleForDiscount) {
@@ -535,9 +536,9 @@
 				if (this.totalTransactions > 5) {
 					this.eligibleForDiscount = true;
 				}
-				if (referrals ||clientObj.referredBy) {
+				if (referrals) {
 					creditReferralBonus(referral,amount);
-					console.log(referral, "referral in newClientConstructor");
+					console.log(referrals, "referral in newClientConstructor");
 					console.log(clientObj.referredBy, "object client.referredBy");
 				}
 			}
@@ -594,8 +595,6 @@
 		
 		document.getElementById("lookupName").value = "";
 	}
-
-//=========== This function is use a different purchase amount===========
 	
  	document.getElementById("purchaseAmountButton").addEventListener("click", function(){
  		purchaseAmount();
@@ -617,7 +616,6 @@
 			"<p> " + " Error: Client record not found with a name of " + lookupName + "</p>"
 			"</div>"
 			document.getElementById("otherAmount").innerHTML = purchaseUpdate;
-
 		} else {
 			clientRecord.buySomething(purchaseNumber);
 			purchaseUpdate = "<div class = 'otherAmount'>" +
@@ -638,9 +636,6 @@
 		document.getElementById("newNumber").value = "";
 
 	}
-
-//=========== transfers the amount from one client to another, it will also throw and error if no such client exists============
-
 
 	document.getElementById("transferButton").addEventListener("click", function(){
 		transfer();
@@ -933,31 +928,31 @@
 	// 	}
 	// }
 
-	function addReferral(referredBy,referrals){
-		var referralNoMatch = "";
-		referralRecord({
-			referredBy: referredBy,
-			clientName: referrals,
-		},function(err, data){
-			if (err){
-				console.log("error");
-				referralNoMatch = "<div class = 'warningMessage'>"+
-				"<p> Error, the client you have entered " + referralSource + " is not in the system " + "</p>"
-				"</div>"
-				document.getElementById("warningMessage").innerHTML = referralNoMatch;
-				document.getElementById("name").addEventListener("click", function(){
-					document.getElementById("warningMessage").innerHTML = "";
-				});
-			} else {
-				for (var i = 0; i < data.length; i++){
-					if(referralSource === data[i].clientName){
-						console.log(referralSource);
-					}
-				}
+	// function addReferral(referredBy,referrals){
+	// 	var referralNoMatch = "";
+	// 	referralRecord({
+	// 		referredBy: referredBy,
+	// 		clientName: referrals,
+	// 	},function(err, data){
+	// 		if (err){
+	// 			console.log("error");
+	// 			referralNoMatch = "<div class = 'warningMessage'>"+
+	// 			"<p> Error, the client you have entered " + referredBy + " is not in the system " + "</p>"
+	// 			"</div>"
+	// 			document.getElementById("warningMessage").innerHTML = referralNoMatch;
+	// 			document.getElementById("name").addEventListener("click", function(){
+	// 				document.getElementById("warningMessage").innerHTML = "";
+	// 			});
+	// 		} else {
+	// 			for (var i = 0; i < data.length; i++){
+	// 				if(referralSource === data[i].clientName){
+	// 					console.log(referralSource);
+	// 				}
+	// 			}
 
-			};
-		});
-	}
+	// 		};
+	// 	});
+	// }
 
 
 
