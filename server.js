@@ -1,6 +1,12 @@
 const Hapi = require('hapi');
 const Good = require('good');
 var mysql = require('mysql');
+var testmodule = require('testmodule');
+// var hf = require('helper_functions');
+var helper = require('helper_functions/index');
+
+// console.log(testmodule.shine);
+
 
 var referralBonusPercent = 0.05;
 
